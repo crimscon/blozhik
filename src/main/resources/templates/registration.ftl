@@ -1,6 +1,6 @@
-<#import "/parts/mainPart.ftl" as e>
+<#import "/parts/bootstrap.ftl" as e>
 
-<@e.page title="${title}">
+<@e.main>
 <!-- REGISTRATION FORM -->
 <div class="container" style="min-height:100%; min-height:100vh">
     <div class="row justify-content-center">
@@ -56,4 +56,4 @@
 
 </div>
 <!--container end.//-->
-</@e.page>
+</@e.main>
