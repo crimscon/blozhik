@@ -20,11 +20,12 @@ public class Message {
 
     @Column(length = 500)
     private String text;
-//    private User author;
 
+    private User author;
 
-    public Message(String title, String text) {
+    public Message(String title, String text, User author) {
         this.title = title;
         this.text = text;
+        this.author = author;
     }
 }

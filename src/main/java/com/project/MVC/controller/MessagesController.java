@@ -1,8 +1,10 @@
 package com.project.MVC.controller;
 
 import com.project.MVC.model.Message;
+import com.project.MVC.model.User;
 import com.project.MVC.repository.MessagesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +17,7 @@ public class MessagesController {
     @Autowired
     private MessagesRepository messagesRepository;
 
-    @GetMapping("/")
+    @GetMapping("/main")
     public String getMessages(Model model) {
         model.addAttribute("messages", messagesRepository.findAll());
         return "main";
@@ -23,22 +25,23 @@ public class MessagesController {
 
     @PostMapping("/add")
     public String addMessage(@RequestParam String title,
-                              @RequestParam String text) {
-        Message message = new Message(title, text);
+                             @RequestParam String text,
+                             @AuthenticationPrincipal User user) {
+        Message message = new Message(title, text, user);
         messagesRepository.save(message);
-        return "redirect:/";
+        return "redirect:/main";
     }
 
     @PostMapping("/delete")
     public String deleteMessage(@RequestParam Long id) {
         messagesRepository.deleteById(id);
-        return "redirect:/";
+        return "redirect:/main";
     }
 
 
     //TODO посмотреть как сделать редактирование
     //TODO разобраться с textarea
-    @PostMapping("/edit")
+    @PostMapping("main/edit")
     public String editMessage(@RequestParam Long id,
                               @RequestParam String title,
                               @RequestParam String text) {
@@ -54,7 +57,7 @@ public class MessagesController {
 
         messagesRepository.save(message);
 
-        return "redirect:/";
+        return "redirect:/main";
     }
 
 }
