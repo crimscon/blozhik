@@ -2,7 +2,6 @@
 <#import "/parts/login.ftl" as l>
 
 <@e.main>
-Login user
 <@l.login "/login" />
 
 </@e.main>
