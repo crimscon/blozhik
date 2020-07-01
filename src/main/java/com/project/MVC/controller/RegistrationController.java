@@ -6,14 +6,17 @@ import com.project.MVC.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
-public class UsersController {
+@RequestMapping("/user")
+public class RegistrationController {
     @Autowired
     private UserRepository userRepo;
 
@@ -53,4 +56,5 @@ public class UsersController {
 
         return "redirect:/login";
     }
+
 }

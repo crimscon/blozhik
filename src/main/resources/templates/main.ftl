@@ -9,6 +9,9 @@
     <li class="nav-item active">
         <a class="nav-link">Home <span class="sr-only">(current)</span></a>
     </li>
+    <li class="nav-item active">
+        <a class="nav-link" href="/user">User list</a>
+    </li>
     <#if user??>
     <li class="nav-item float-right">
         <a class="nav-link" href="#">Link</a>
@@ -54,11 +57,13 @@
 
                     <div class="btn-toolbar justify-content-between" role="toolbar"
                          aria-label="Toolbar with button groups">
-                        <div class="btn-group" role="group" aria-label="First group">
-                            <div class="input-group-prepend">
-                                <div class="input-group-text" id="btnGroupAddon2">${message.author.username}</div>
+                        <a href="${message.author.id}/profile">
+                            <div class="btn-group" role="group" aria-label="First group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text" id="btnGroupAddon2">${message.author.username}</div>
+                                </div>
                             </div>
-                        </div>
+                        </a>
                         <div class="btn-group" role="group" aria-label="Second group">
                             <form method="get" action="${message.id}/delete">
                                 <button type="submit" class="btn btn-outline-secondary"><i class="fas fa-trash-alt"></i></button>
