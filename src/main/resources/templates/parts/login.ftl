@@ -1,3 +1,5 @@
+<!--<#include "security.ftl">-->
+
 <#macro login path>
 
 <style>
@@ -112,6 +114,7 @@ body {
 
 <#macro logout>
 <form action="/logout" method="post" class="form-inline">
+    <div class="mr-2 navbar-text">${name}</div>
     <input type="hidden" name="_csrf" value="${_csrf.token}"/>
     <button class="btn btn-outline-primary my-2 my-sm-0" type="submit"><i class="fas fa-sign-out-alt"></i></button>
 </form>

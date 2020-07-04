@@ -1,23 +1,7 @@
 <#import "/parts/bootstrap.ftl" as e>
-<#import "/parts/navbar.ftl" as nav>
-<#import "/parts/login.ftl" as l>
 
 
-<@e.main>
-<@nav.bar>
-<ul class="navbar-nav mr-auto">
-    <li class="nav-item active">
-        <a class="nav-link">Home <span class="sr-only">(current)</span></a>
-    </li>
-    <#if user??>
-    <li class="nav-item float-right">
-        <a class="nav-link" href="#">Link</a>
-    </li>
-</#if>
-</ul>
-
-<@l.logout />
-</@nav.bar>
+<@e.main true>
 
 <div class="container">
     <div class="row">

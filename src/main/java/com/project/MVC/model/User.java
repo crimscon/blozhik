@@ -1,7 +1,8 @@
 package com.project.MVC.model;
 
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -11,7 +12,8 @@ import java.util.Set;
 
 @Entity
 @Table(name = "usr")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 public class User implements UserDetails {
     @Id
@@ -49,5 +51,9 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return isActive();
+    }
+
+    public boolean isAdmin() {
+        return roles.contains(Role.ADMIN);
     }
 }
