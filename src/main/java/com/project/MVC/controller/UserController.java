@@ -2,35 +2,43 @@ package com.project.MVC.controller;
 
 import com.project.MVC.model.Role;
 import com.project.MVC.model.User;
-import com.project.MVC.repository.UserRepository;
+import com.project.MVC.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/user")
+@RequestMapping("/users")
 @PreAuthorize("hasAuthority('ADMIN')")
 public class UserController {
     @Autowired
-    private UserRepository userRepo;
+    private UserService userService;
 
     @GetMapping
-    public String userList(Model model) {
-        model.addAttribute("users", userRepo.findAll());
+    public String userList(@RequestParam(required = false, defaultValue = "") String filter, Model model) {
+        List<User> users;
+
+        if (filter != null && !filter.isEmpty()) {
+            users = new ArrayList<>();
+            users.add((User) userService.loadUserByUsername(filter));
+        } else {
+            users = userService.findAll();
+        }
+
+        model.addAttribute("users", users);
+        model.addAttribute("filter", filter);
 
         return "User/userList";
     }
 
     @GetMapping("{userId}")
     public String userEditForm(@PathVariable Long userId, Model model) {
-        User user = userRepo.findById(userId).get();
+        User user = userService.findById(userId);
         model.addAttribute("user", user);
         model.addAttribute("roles", Role.values());
 
@@ -40,11 +48,13 @@ public class UserController {
     @PostMapping
     public String userSave(
             @RequestParam String username,
+            @RequestParam String password,
             @RequestParam Map<String, String> form,
             @RequestParam("userId") Long userId
     ) {
-        User user = userRepo.findById(userId).get();
+        User user = userService.findById(userId);
         user.setUsername(username);
+        user.setPassword(password);
 
         Set<String> roles = Arrays.stream(Role.values())
                 .map(Role::name)
@@ -58,8 +68,17 @@ public class UserController {
             }
         }
 
-        userRepo.save(user);
+        userService.save(user);
 
-        return "redirect:/user";
+        return "redirect:/users";
     }
+
+    @PostMapping("delete")
+    public String deleteUser(@RequestParam Long userId) {
+        userService.deleteById(userId);
+
+        return "redirect:/users";
+    }
+
+
 }

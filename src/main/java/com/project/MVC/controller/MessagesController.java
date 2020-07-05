@@ -2,7 +2,7 @@ package com.project.MVC.controller;
 
 import com.project.MVC.model.Message;
 import com.project.MVC.model.User;
-import com.project.MVC.repository.MessagesRepository;
+import com.project.MVC.service.MessagesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class MessagesController {
 
     @Autowired
-    private MessagesRepository messagesRepository;
+    private MessagesService messagesService;
 
-    @GetMapping("/main")
+    @GetMapping("/messages")
     public String getMessages(Model model) {
-        model.addAttribute("messages", messagesRepository.findAll());
+        model.addAttribute("messages", messagesService.findAll());
         return "main";
     }
 
@@ -29,24 +29,24 @@ public class MessagesController {
                              @RequestParam String text,
                              @AuthenticationPrincipal User user) {
         Message message = new Message(title, text, user);
-        messagesRepository.save(message);
-        return "redirect:/main";
+        messagesService.save(message);
+        return "redirect:/messages";
     }
 
     @GetMapping("{id}/delete")
     public String deleteMessage(@PathVariable Long id) {
-        messagesRepository.deleteById(id);
-        return "redirect:/main";
+        messagesService.deleteById(id);
+        return "redirect:/messages";
     }
 
 
     //TODO посмотреть как сделать редактирование
     //TODO разобраться с textarea
-    @PostMapping("main/edit")
+    @PostMapping("messages/edit")
     public String editMessage(@RequestParam Long id,
                               @RequestParam String title,
                               @RequestParam String text) {
-        Message message = messagesRepository.findById(id).get();
+        Message message = messagesService.findById(id);
 
         if (!message.getText().equals(text)) {
             message.setText(text);
@@ -56,9 +56,9 @@ public class MessagesController {
             message.setTitle(title);
         }
 
-        messagesRepository.save(message);
+        messagesService.save(message);
 
-        return "redirect:/main";
+        return "redirect:/messages";
     }
 
 }
