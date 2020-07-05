@@ -16,7 +16,7 @@ public class Message {
     private Long id;
 
     @Column(length = 300)
-    private String title, smallText;
+    private String title;
 
     @Column(length = 500)
     private String text;

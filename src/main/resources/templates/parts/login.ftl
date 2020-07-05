@@ -1,4 +1,4 @@
-<!--<#include "security.ftl">-->
+<#include "security.ftl">
 
 <#macro login path>
 
@@ -85,11 +85,11 @@ body {
         <label for="username"></label>
     </div>
 
-    <div class="form-label-group">
-        <input type="email" id="email" name="email" class="form-control" placeholder="E-mail" required=""
-               autofocus="autofocus" autocomplete="off">
-        <label for="email"></label>
-    </div>
+<!--    <div class="form-label-group">-->
+<!--        <input type="email" id="email" name="email" class="form-control" placeholder="E-mail" required=""-->
+<!--               autofocus="autofocus" autocomplete="off">-->
+<!--        <label for="email"></label>-->
+<!--    </div>-->
 
     <div class="form-label-group">
         <input type="password" id="inputPassword" name="password" class="form-control" placeholder="Password" required="required"
@@ -114,7 +114,7 @@ body {
 
 <#macro logout>
 <form action="/logout" method="post" class="form-inline">
-    <div class="mr-2 navbar-text">${name}</div>
+    <a href="../../${name}/profile" class="btn btn-link">${name}</a>
     <input type="hidden" name="_csrf" value="${_csrf.token}"/>
     <button class="btn btn-outline-primary my-2 my-sm-0" type="submit"><i class="fas fa-sign-out-alt"></i></button>
 </form>
