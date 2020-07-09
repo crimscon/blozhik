@@ -25,10 +25,13 @@ public class UserController {
 
         if (filter != null && !filter.isEmpty()) {
             users = new ArrayList<>();
-            users.add((User) userService.loadUserByUsername(filter));
+
+            User user = (User) userService.loadUserByUsername(filter);
+            if (user != null) users.add(user);
         } else {
             users = userService.findAll();
         }
+
 
         model.addAttribute("users", users);
         model.addAttribute("filter", filter);

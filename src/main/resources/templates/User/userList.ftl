@@ -10,7 +10,7 @@
             <input type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1"
                 name="filter" value="${filter?ifExists}">
             <div class="input-group-append">
-                <button class="btn btn-outline-secondary" type="button" id="button-addon2">Search</button>
+                <button class="btn btn-outline-secondary" type="submit" id="button-addon1">Search</button>
             </div>
         </div>
     </form>
@@ -38,6 +38,19 @@
 <!--                        <button type="submit">Delete</button>-->
 <!--                    </form>-->
 <!--                </td>-->
+            </tr>
+        <#else>
+            <tr>
+                <th scope="row"></th>
+                <td></td>
+                <td></td>
+                <td></td>
+                <!--                <td>-->
+                <!--                    <form action="delete" method="post">-->
+                <!--                        <input hidden name="userId" value="${user.id}">-->
+                <!--                        <button type="submit">Delete</button>-->
+                <!--                    </form>-->
+                <!--                </td>-->
             </tr>
         </#list>
         </tbody>

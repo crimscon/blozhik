@@ -15,17 +15,42 @@ public class Message {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(length = 300)
+    @Column(columnDefinition = "text", length = 300)
     private String title;
 
-    @Column(length = 500)
+    @Column(columnDefinition = "text", length = 300)
+    private String announce;
+
+    @Column(columnDefinition = "text")
     private String text;
+
+    private String filename;
+    private String color;
 
     private User author;
 
-    public Message(String title, String text, User author) {
+    public Message(String title, String text, User author, String color) {
         this.title = title;
         this.text = text;
+        this.announce = createAnnounce(text);
         this.author = author;
+        this.color = color;
+    }
+
+    private String createAnnounce(String text) {
+        String[] textArray = text.split(" ");
+        if (textArray.length == 1) return text.substring(0, Math.min(text.length(), 300));
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (String s : textArray)
+            if ((stringBuilder.length() + s.length() + 3) <= 300) {
+                stringBuilder.append(s).append(" ");
+            }
+
+        stringBuilder.trimToSize();
+        stringBuilder.append("...");
+
+        return stringBuilder.toString();
     }
 }

@@ -4,6 +4,7 @@ import com.project.MVC.model.Message;
 import com.project.MVC.model.User;
 import com.project.MVC.service.MessagesService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,6 +12,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Map;
+import java.util.UUID;
 
 @Controller
 public class MessagesController {
@@ -25,11 +34,12 @@ public class MessagesController {
     }
 
     @PostMapping("/add")
-    public String addMessage(@RequestParam String title,
-                             @RequestParam String text,
-                             @AuthenticationPrincipal User user) {
-        Message message = new Message(title, text, user);
-        messagesService.save(message);
+    public String addMessage(@RequestParam(defaultValue = "") String title,
+                             @RequestParam(defaultValue = "") String text,
+                             @RequestParam("picture") MultipartFile file,
+                             @RequestParam Map<String, String> form,
+                             @AuthenticationPrincipal User user) throws IOException {
+        messagesService.createMessage(title, text, file, user, form);
         return "redirect:/messages";
     }
 
