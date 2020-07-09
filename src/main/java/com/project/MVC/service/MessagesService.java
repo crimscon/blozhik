@@ -36,7 +36,7 @@ public class MessagesService {
                               User user,
                               Map<String, String> form) throws IOException {
 
-        String colorValue = Color.LIGHT.name();
+        String colorValue = Color.LIGHT.name().toLowerCase();
         Set<String> colors = Arrays.stream(Color.values())
                 .map(Color::name)
                 .collect(Collectors.toSet());
