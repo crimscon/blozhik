@@ -92,7 +92,8 @@
                 <div class="modal-body">
                     <div class="form-group mb-3">
                         <label for="title">Заголовок:</label>
-                        <input type="text" id="title" name="title" class="form-control" autocomplete="off" maxlength="300">
+                        <input type="text" id="title" name="title" class="form-control" autocomplete="off"
+                               maxlength="300">
                         <input type="hidden" name="_csrf" value="${_csrf.token}"/>
                     </div>
                     <div class="form-group">
