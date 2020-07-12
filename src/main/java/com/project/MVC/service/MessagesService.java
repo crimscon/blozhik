@@ -6,6 +6,9 @@ import com.project.MVC.model.User;
 import com.project.MVC.repository.MessagesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,7 +16,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,31 +29,28 @@ public class MessagesService {
     @Value("${upload.path}")
     private String uploadPath;
 
-    public List<Message> findByAuthor(Long userId) {
-        return messagesRepository.findAll().stream().filter(message ->
-                userId.equals(message.getAuthor().getId())).collect(Collectors.toList());
+    public Page<Message> findByAuthor(Long userId, Pageable pageable) {
+        List<Message> messages = messagesRepository.findAll().stream().
+                filter(message -> message.getAuthor().getId().equals(userId)).
+                collect(Collectors.toList());
+
+        int start = (int) pageable.getOffset(),
+                end = Math.min((start + pageable.getPageSize()), messages.size());
+
+        return new PageImpl<Message>(messages.subList(start, end), pageable, messages.size());
+
     }
 
     public void createMessage(String title,
                               String text,
                               MultipartFile file,
                               User user,
-                              Map<String, String> form) throws IOException {
+                              Color color) throws IOException {
 
-        String colorValue = Color.LIGHT.name().toLowerCase();
-        Set<String> colors = Arrays.stream(Color.values())
-                .map(Color::name)
-                .collect(Collectors.toSet());
-
-        for (String key : form.keySet()) {
-            if (colors.contains(key.toUpperCase())) colorValue = key;
-        }
-
-        Message message = new Message(title, text, user, colorValue);
+        Message message = new Message(title, text, user, color);
 
         if (file != null && !file.getOriginalFilename().isEmpty()) {
 
-            Files.deleteIfExists(Paths.get(new File(uploadPath + "/" + message.getFilename()).getPath()));
             File uploadDir = new File(uploadPath);
 
             if (!uploadDir.exists()) uploadDir.mkdir();
@@ -66,7 +67,7 @@ public class MessagesService {
                 !message.getTitle().isEmpty() ||
                 !message.getText().isEmpty()) {
             save(message);
-        }
+        } else Files.deleteIfExists(Paths.get(new File(uploadPath + "/" + message.getFilename()).getPath()));
     }
 
     public <S extends Message> void save(S s) {
@@ -77,8 +78,8 @@ public class MessagesService {
         return messagesRepository.findById(aLong).get();
     }
 
-    public List<Message> findAll() {
-        return messagesRepository.findAll();
+    public Page<Message> findAll(Pageable pageable) {
+        return messagesRepository.findAll(pageable);
     }
 
     public void deleteById(Long aLong) {
@@ -87,5 +88,14 @@ public class MessagesService {
 
     public void delete(Message message) {
         messagesRepository.delete(message);
+    }
+
+    public void deleteMessage(Long id) throws IOException {
+        Message message = findById(id);
+        if (message.getFilename() != null) {
+            Files.deleteIfExists(Paths.get(new File(uploadPath + "/" + message.getFilename()).getPath()));
+        }
+
+        delete(message);
     }
 }

@@ -25,11 +25,11 @@ public class Message {
     private String text;
 
     private String filename;
-    private String color;
+    private Color color;
 
     private User author;
 
-    public Message(String title, String text, User author, String color) {
+    public Message(String title, String text, User author, Color color) {
         this.title = title;
         this.text = text;
         this.announce = createAnnounce(text);

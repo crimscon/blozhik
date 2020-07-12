@@ -1,10 +1,14 @@
 package com.project.MVC.controller;
 
+import com.project.MVC.model.Color;
 import com.project.MVC.model.User;
 import com.project.MVC.service.MessagesService;
 import com.project.MVC.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,12 +36,17 @@ public class ProfileController {
     private String uploadPath;
 
     @GetMapping("{username}/profile")
-    public String userProfile(@PathVariable String username, Model model) {
+    public String userProfile(@PathVariable String username,
+                              @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable,
+                              Model model) {
         User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = (User) userService.loadUserByUsername(username);
 
-        if (!user.getId().equals(currentUser.getId()))
-            model.addAttribute("messages", messagesService.findByAuthor(user.getId()));
+        if (!user.getId().equals(currentUser.getId())) {
+            model.addAttribute("page", messagesService.findByAuthor(user.getId(), pageable));
+            model.addAttribute("url", "");
+            model.addAttribute("colors", Color.values());
+        }
 
         model.addAttribute("userProfile", user);
 
@@ -45,12 +54,16 @@ public class ProfileController {
     }
 
     @GetMapping("{username}/profile/messages")
-    public String userMessages(@PathVariable String username, Model model) {
+    public String userMessages(@PathVariable String username,
+                               @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable,
+                               Model model) {
         User user = (User) userService.loadUserByUsername(username);
 
-        model.addAttribute("messages", messagesService.findByAuthor(user.getId()));
+        model.addAttribute("page", messagesService.findByAuthor(user.getId(), pageable));
+        model.addAttribute("url", "");
+        model.addAttribute("colors", Color.values());
 
-        return userProfile(username, model);
+        return userProfile(username, pageable, model);
     }
 
     @GetMapping("{username}/profile/edit")
