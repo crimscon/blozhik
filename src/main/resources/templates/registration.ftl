@@ -3,5 +3,4 @@
 
 <@e.main false>
     <@l.register "/registration" />
-
 </@e.main>

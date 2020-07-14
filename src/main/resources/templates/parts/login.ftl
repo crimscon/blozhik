@@ -13,13 +13,6 @@
             background-color: #f5f5f5;
             padding-bottom: 40px;
         }
-
-        .form-signin {
-            width: 100%;
-            max-width: 420px;
-            padding: 15px;
-            margin: auto;
-        }
     </style>
 
     <form class="form-signin" action="${path}" method="post">
@@ -60,13 +53,6 @@
             padding-top: 40px;
             background-color: #f5f5f5;
             padding-bottom: 40px;
-        }
-
-        .form-signin {
-            width: 100%;
-            max-width: 420px;
-            padding: 15px;
-            margin: auto;
         }
 
     </style>

@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Data
@@ -26,10 +27,12 @@ public class Message {
 
     private String filename;
     private Color color;
+    private Date date;
 
     private User author;
 
     public Message(String title, String text, User author, Color color) {
+        this.date = new Date();
         this.title = title;
         this.text = text;
         this.announce = createAnnounce(text);

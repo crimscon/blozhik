@@ -4,6 +4,7 @@ import com.project.MVC.model.Color;
 import com.project.MVC.model.Message;
 import com.project.MVC.model.User;
 import com.project.MVC.service.MessagesService;
+import com.project.MVC.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -25,12 +26,16 @@ public class MessagesController {
     @Autowired
     private MessagesService messagesService;
 
+    @Autowired
+    private UserService userService;
+
     @GetMapping("/messages")
     public String getMessages(Model model,
                               @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) {
         model.addAttribute("page", messagesService.findAll(pageable));
-        model.addAttribute("colors", Color.values());
         model.addAttribute("url", "/messages");
+
+        addMessageSendPart(model);
         return "main";
     }
 
@@ -44,32 +49,47 @@ public class MessagesController {
         return "redirect:/messages";
     }
 
-    @GetMapping("{id}/delete")
+    @GetMapping("/messages/{id}/delete")
     public String deleteMessage(@PathVariable Long id) throws IOException {
-        messagesService.deleteMessage(id);
-        return "redirect:/messages";
+        return messagesService.deleteMessage(id) ? "redirect:/messages" : "redirect:/messages/" + id;
     }
 
-
-    //TODO посмотреть как сделать редактирование
-    //TODO разобраться с textarea
-    @PostMapping("messages/edit")
-    public String editMessage(@RequestParam Long id,
+    @PostMapping("messages/{id}/edit")
+    public String editMessage(@PathVariable Long id,
                               @RequestParam String title,
                               @RequestParam String text) {
+        messagesService.editMessage(id, title, text);
+
+        return "redirect:/messages/" + id;
+    }
+
+    @GetMapping("/messages/{id}")
+    public String getMessage(@PathVariable Long id, Model model) {
+        Message message = messagesService.findById(id);
+        model.addAttribute("message", message);
+        model.addAttribute("author", userService.findById(message.getAuthor().getId()));
+        model.addAttribute("edit", false);
+        model.addAttribute("availableEdit", messagesService.availableEdit(message));
+
+        addMessageSendPart(model);
+
+        return "messageDetail";
+    }
+
+    private void addMessageSendPart(Model model) {
+        model.addAttribute("colors", Color.values());
+    }
+
+    @GetMapping("messages/{id}/edit")
+    public String getEditForm(@PathVariable Long id, Model model) {
         Message message = messagesService.findById(id);
 
-        if (!message.getText().equals(text)) {
-            message.setText(text);
-        }
+        model.addAttribute("message", message);
+        model.addAttribute("edit", true);
 
-        if (!message.getTitle().equals(title)) {
-            message.setTitle(title);
-        }
+        addMessageSendPart(model);
 
-        messagesService.save(message);
-
-        return "redirect:/messages";
+        return messagesService.availableEdit(message) ? "messageDetail" : "redirect:/messages/" + id;
     }
 
 }

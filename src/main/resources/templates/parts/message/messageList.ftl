@@ -1,12 +1,12 @@
-<#include "security.ftl">
-<#import "pager.ftl" as p>
+<#include "../security.ftl">
+<#import "../pager.ftl" as p>
 
 
 <#macro message page>
 
     <#include "messageSend.ftl">
 
-    <div class="card-columns mt-2">
+    <div class="card-columns mt-3">
     <#list page.content as message>
         <#if message.filename?? && message.title != "" && message.announce != "">
             <div class="card border-${message.color?lower_case}">
@@ -16,8 +16,9 @@
                     <p class="card-text">${message.announce}</p>
                 </div>
                 <div class="card-footer bg-transparent">
-                    <a href="../../${message.author.username}/profile"
+                    <a href="../../${message.author.username}/profile" style="transform: none"
                        class="badge badge-${message.color?lower_case}">${message.author.username}</a>
+                    <a href="/messages/${message.id}" class="stretched-link"></a>
                 </div>
             </div>
         <#elseif message.filename?? && message.title != "">
@@ -27,6 +28,7 @@
                 <div class="card-footer bg-transparent">
                     <a href="../../${message.author.username}/profile"
                        class="badge badge-${message.color?lower_case}">${message.author.username}</a>
+                    <a href="/messages/${message.id}" class="stretched-link"></a>
                 </div>
             </div>
         <#elseif message.filename?? && message.announce != "">
@@ -38,6 +40,7 @@
                 <div class="card-footer bg-transparent">
                     <a href="../../${message.author.username}/profile"
                        class="badge badge-${message.color?lower_case}">${message.author.username}</a>
+                    <a href="/messages/${message.id}" class="stretched-link"></a>
                 </div>
             </div>
         <#elseif message.announce != "" && message.title == "">
@@ -48,6 +51,7 @@
                 <div class="card-footer bg-transparent">
                     <a href="../../${message.author.username}/profile"
                        class="badge badge-${message.color?lower_case}">${message.author.username}</a>
+                    <a href="/messages/${message.id}" class="stretched-link"></a>
                 </div>
             </div>
         <#elseif message.title != "" && message.announce != "">
@@ -59,6 +63,7 @@
                 <div class="card-footer bg-transparent">
                     <a href="../../${message.author.username}/profile"
                        class="badge badge-${message.color?lower_case}">${message.author.username}</a>
+                    <a href="/messages/${message.id}" class="stretched-link"></a>
                 </div>
             </div>
         <#elseif message.filename??>
@@ -67,6 +72,7 @@
                 <div class="card-footer bg-transparent">
                     <a href="../../${message.author.username}/profile"
                        class="badge badge-${message.color?lower_case}">${message.author.username}</a>
+                    <a href="/messages/${message.id}" class="stretched-link"></a>
                 </div>
             </div>
         </#if>

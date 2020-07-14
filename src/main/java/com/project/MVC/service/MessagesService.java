@@ -4,11 +4,13 @@ import com.project.MVC.model.Color;
 import com.project.MVC.model.Message;
 import com.project.MVC.model.User;
 import com.project.MVC.repository.MessagesRepository;
+import com.project.MVC.util.ThumbnailUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -59,6 +62,7 @@ public class MessagesService {
             String filename = uuid + "." + file.getOriginalFilename();
 
             file.transferTo(new File(uploadPath + "/" + filename));
+            ThumbnailUtil.createThumbnail(uploadPath + "/" + filename);
 
             message.setFilename(filename);
         }
@@ -69,6 +73,8 @@ public class MessagesService {
             save(message);
         } else Files.deleteIfExists(Paths.get(new File(uploadPath + "/" + message.getFilename()).getPath()));
     }
+
+
 
     public <S extends Message> void save(S s) {
         messagesRepository.save(s);
@@ -90,12 +96,44 @@ public class MessagesService {
         messagesRepository.delete(message);
     }
 
-    public void deleteMessage(Long id) throws IOException {
+    public boolean deleteMessage(Long id) throws IOException {
         Message message = findById(id);
-        if (message.getFilename() != null) {
-            Files.deleteIfExists(Paths.get(new File(uploadPath + "/" + message.getFilename()).getPath()));
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (currentUser.getId().equals(message.getAuthor().getId())) {
+            if (message.getFilename() != null) {
+                Files.deleteIfExists(Paths.get(new File(uploadPath + "/" + message.getFilename()).getPath()));
+            }
+
+            delete(message);
+
+            return true;
+        }
+        return false;
+    }
+
+    public boolean availableEdit(Message message) {
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.SECOND, 20);
+
+        return message.getDate() != null
+                && message.getAuthor().getId().equals(currentUser.getId())
+                && !message.getDate().after(calendar.getTime());
+    }
+
+    public void editMessage(Long id, String title, String text) {
+        Message message = findById(id);
+
+        if (!message.getText().equals(text)) {
+            message.setText(text);
         }
 
-        delete(message);
+        if (!message.getTitle().equals(title)) {
+            message.setTitle(title);
+        }
+
+        save(message);
     }
 }

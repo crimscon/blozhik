@@ -4,6 +4,7 @@ import com.project.MVC.model.Color;
 import com.project.MVC.model.User;
 import com.project.MVC.service.MessagesService;
 import com.project.MVC.service.UserService;
+import com.project.MVC.util.ThumbnailUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
@@ -94,6 +95,7 @@ public class ProfileController {
             String filename = uuid + "." + file.getOriginalFilename();
 
             file.transferTo(new File(uploadPath + "/" + filename));
+            ThumbnailUtil.createThumbnail(uploadPath + "/" + filename);
 
             user.setProfile_pic(filename);
         }

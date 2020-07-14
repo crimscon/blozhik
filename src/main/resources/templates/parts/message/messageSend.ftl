@@ -1,77 +1,3 @@
-<style>
-
-    input[type="radio"] {
-        display: none;
-    }
-
-    input[type="radio"] + label {
-        font-weight: 400;
-        font-size: 14px;
-    }
-
-    input[type="radio"] + label span {
-        display: inline-block;
-        width: 18px;
-        height: 18px;
-        margin: -2px 10px 0 0;
-        vertical-align: middle;
-        cursor: pointer;
-        -moz-border-radius: 50%;
-        border-radius: 50%;
-        border: 3px solid #ffffff;
-    }
-
-    input[type="radio"] + label span {
-        background-color: #fff;
-    }
-
-    input[type="radio"]:checked + label {
-        font-weight: 700;
-    }
-
-    input[type="radio"]:checked + label span {
-        background-color: #ff8800;
-        border: 2px solid #ffffff;
-        box-shadow: 2px 2px 2px rgba(0, 0, 0, .1);
-    }
-
-    input[type="radio"] + label span, input[type="radio"]:checked + label span {
-        -webkit-transition: background-color 0.24s linear;
-        -o-transition: background-color 0.24s linear;
-        -moz-transition: background-color 0.24s linear;
-        transition: background-color 0.24s linear;
-    }
-
-    .floatingButton {
-        width: 50px;
-        height: 50px;
-        bottom: 20px;
-        right: 20px;
-        box-shadow: 2px 2px 3px #999;
-        z-index: 100;
-    }
-
-</style>
-
-<script>
-    function changeColor() {
-        const id = $(this).attr("id");
-        const button = $("#dropdownMenuButton");
-        if (changeColor.last) button.removeClass(changeColor.last);
-        const currentColor = "btn-outline-" + id.toLowerCase();
-        changeColor.last = currentColor;
-        $("#dropdownMenuButton").addClass(currentColor);
-    }
-
-    changeColor.last = "btn-outline-primary"
-
-    window.onload = function () {
-
-        $(".dropdown-menu").children("input").click(changeColor);
-
-    }
-</script>
-
 <button class="btn btn-primary position-fixed rounded-circle floatingButton" type="button" data-toggle="modal"
         data-target="#sendMessage">
     <i class="fas fa-pen"></i>
@@ -79,11 +5,11 @@
 
 <div class="modal fade" id="sendMessage" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog"
      aria-labelledby="sendMessageLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable">
-        <div class="modal-content">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content border-primary" id="Message">
             <form method="post" action="../../add?${_csrf.parameterName}=${_csrf.token}" enctype="multipart/form-data"
                   class="form-group">
-                <div class="modal-header">
+                <div class="modal-header alert-primary">
                     <h5 class="modal-title" id="sendMessageLabel">Новый пост</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true"><i class="fas fa-times"></i></span>
@@ -92,13 +18,13 @@
                 <div class="modal-body">
                     <div class="form-group mb-3">
                         <label for="title">Заголовок:</label>
-                        <input type="text" id="title" name="title" class="form-control" autocomplete="off"
+                        <input type="text" id="title" name="title" class="form-control shadow-none" autocomplete="off"
                                maxlength="300">
                         <input type="hidden" name="_csrf" value="${_csrf.token}"/>
                     </div>
                     <div class="form-group">
                         <label for="TextArea">Текст:</label>
-                        <textarea name="text" class="form-control"
+                        <textarea name="text" class="form-control shadow-none"
                                   id="TextArea" rows="5" autocomplete="off"></textarea>
                     </div>
                 </div>
@@ -138,11 +64,11 @@
                             <div class="custom-file">
                                 <input accept=".jpg, .jpeg, .png" name="picture" type="file" style="display:none"
                                        id="inputFile">
-                                <label for="inputFile" class="btn btn-outline-primary m-0">
+                                <label for="inputFile" class="m-0 btn btn-outline-primary">
                                     <i class="fas fa-paperclip"></i>
                                 </label>
                             </div>
-                            <button class="btn btn-outline-primary float-right" type="submit"><i
+                            <button class="float-right btn btn-outline-primary" type="submit"><i
                                         class="fas fa-arrow-circle-right"></i></button>
                         </div>
                     </div>
