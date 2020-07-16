@@ -1,5 +1,6 @@
 package com.project.MVC.model;
 
+import com.project.MVC.model.enums.Color;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -25,11 +26,13 @@ public class Message {
     @Column(columnDefinition = "text")
     private String text;
 
-    private String filename;
+    @Enumerated(EnumType.STRING)
     private Color color;
-    private Date date;
 
+    @Temporal(TemporalType.DATE)
+    private Date date;
     private User author;
+    private String filename;
 
     public Message(String title, String text, User author, Color color) {
         this.date = new Date();

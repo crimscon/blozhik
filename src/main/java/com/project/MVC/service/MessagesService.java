@@ -1,8 +1,8 @@
 package com.project.MVC.service;
 
-import com.project.MVC.model.Color;
 import com.project.MVC.model.Message;
 import com.project.MVC.model.User;
+import com.project.MVC.model.enums.Color;
 import com.project.MVC.repository.MessagesRepository;
 import com.project.MVC.util.ThumbnailUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Calendar;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -54,15 +53,7 @@ public class MessagesService {
 
         if (file != null && !file.getOriginalFilename().isEmpty()) {
 
-            File uploadDir = new File(uploadPath);
-
-            if (!uploadDir.exists()) uploadDir.mkdir();
-
-            String uuid = UUID.randomUUID().toString();
-            String filename = uuid + "." + file.getOriginalFilename();
-
-            file.transferTo(new File(uploadPath + "/" + filename));
-            ThumbnailUtil.createThumbnail(uploadPath + "/" + filename);
+            String filename = ThumbnailUtil.createFile(file, uploadPath, true);
 
             message.setFilename(filename);
         }
@@ -74,22 +65,20 @@ public class MessagesService {
         } else Files.deleteIfExists(Paths.get(new File(uploadPath + "/" + message.getFilename()).getPath()));
     }
 
-
-
     public <S extends Message> void save(S s) {
         messagesRepository.save(s);
     }
 
-    public Message findById(Long aLong) {
-        return messagesRepository.findById(aLong).get();
+    public Message findById(Long id) {
+        return messagesRepository.getOne(id);
     }
 
     public Page<Message> findAll(Pageable pageable) {
         return messagesRepository.findAll(pageable);
     }
 
-    public void deleteById(Long aLong) {
-        messagesRepository.deleteById(aLong);
+    public void deleteById(Long id) {
+        messagesRepository.deleteById(id);
     }
 
     public void delete(Message message) {

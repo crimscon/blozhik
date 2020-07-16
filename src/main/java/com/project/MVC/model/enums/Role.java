@@ -1,4 +1,4 @@
-package com.project.MVC.model;
+package com.project.MVC.model.enums;
 
 import org.springframework.security.core.GrantedAuthority;
 

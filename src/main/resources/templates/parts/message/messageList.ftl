@@ -10,7 +10,7 @@
     <#list page.content as message>
         <#if message.filename?? && message.title != "" && message.announce != "">
             <div class="card border-${message.color?lower_case}">
-                <img src="/img/${message.filename}" class="card-img-top">
+                <img src="/img/thumbs/${message.filename}" class="card-img-top">
                 <h5 class="card-header alert-${message.color?lower_case}">${message.title}</h5>
                 <div class="card-body">
                     <p class="card-text">${message.announce}</p>
@@ -23,7 +23,7 @@
             </div>
         <#elseif message.filename?? && message.title != "">
             <div class="card bg-${message.color?lower_case}">
-                <img src="/img/${message.filename}" class="card-img-top">
+                <img src="/img/thumbs/${message.filename}" class="card-img-top">
                 <h5 class="card-header alert-${message.color?lower_case}">${message.title}</h5>
                 <div class="card-footer bg-transparent">
                     <a href="../../${message.author.username}/profile"
@@ -33,7 +33,7 @@
             </div>
         <#elseif message.filename?? && message.announce != "">
             <div class="card border-${message.color?lower_case}">
-                <img src="/img/${message.filename}" class="card-img-top">
+                <img src="/img/thumbs/${message.filename}" class="card-img-top">
                 <blockquote class="blockquote mb-0 card-body">
                     <p>${message.announce}</p>
                 </blockquote>
@@ -68,7 +68,7 @@
             </div>
         <#elseif message.filename??>
             <div class="card">
-                <img src="/img/${message.filename}" class="card-img-top">
+                <img src="/img/thumbs/${message.filename}" class="card-img-top">
                 <div class="card-footer bg-transparent">
                     <a href="../../${message.author.username}/profile"
                        class="badge badge-${message.color?lower_case}">${message.author.username}</a>

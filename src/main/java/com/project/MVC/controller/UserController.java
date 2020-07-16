@@ -1,7 +1,7 @@
 package com.project.MVC.controller;
 
-import com.project.MVC.model.Role;
 import com.project.MVC.model.User;
+import com.project.MVC.model.enums.Role;
 import com.project.MVC.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -9,8 +9,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/users")
@@ -21,17 +21,7 @@ public class UserController {
 
     @GetMapping
     public String userList(@RequestParam(required = false, defaultValue = "") String filter, Model model) {
-        List<User> users;
-
-        if (filter != null && !filter.isEmpty()) {
-            users = new ArrayList<>();
-
-            User user = (User) userService.loadUserByUsername(filter);
-            if (user != null) users.add(user);
-        } else {
-            users = userService.findAll();
-        }
-
+        List<User> users = userService.getUserList(filter);
 
         model.addAttribute("users", users);
         model.addAttribute("filter", filter);
@@ -55,23 +45,7 @@ public class UserController {
             @RequestParam Map<String, String> form,
             @RequestParam("userId") Long userId
     ) {
-        User user = userService.findById(userId);
-        user.setUsername(username);
-        user.setPassword(password);
-
-        Set<String> roles = Arrays.stream(Role.values())
-                .map(Role::name)
-                .collect(Collectors.toSet());
-
-        user.getRoles().clear();
-
-        for (String key : form.keySet()) {
-            if (roles.contains(key)) {
-                user.getRoles().add(Role.valueOf(key));
-            }
-        }
-
-        userService.save(user);
+        userService.saveUser(username, password, form, userId);
 
         return "redirect:/users";
     }

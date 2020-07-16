@@ -1,19 +1,37 @@
 package com.project.MVC.service;
 
 import com.project.MVC.model.User;
+import com.project.MVC.model.UserProfile;
+import com.project.MVC.model.enums.Role;
+import com.project.MVC.model.enums.Sex;
+import com.project.MVC.repository.UserProfileRepository;
 import com.project.MVC.repository.UserRepository;
+import com.project.MVC.util.ThumbnailUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService implements UserDetailsService {
     @Autowired
     private UserRepository userRepo;
+
+    @Autowired
+    private UserProfileRepository userProfileRepo;
+
+    @Value("${upload.path}")
+    private String uploadPath;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -25,7 +43,7 @@ public class UserService implements UserDetailsService {
     }
 
     public User findById(Long aLong) {
-        return userRepo.findById(aLong).get();
+        return userRepo.getOne(aLong);
     }
 
     public List<User> findAll() {
@@ -35,4 +53,79 @@ public class UserService implements UserDetailsService {
     public void deleteById(Long id) {
         userRepo.deleteById(id);
     }
+
+    public List<User> getUserList(String filter) {
+        List<User> users;
+
+        if (filter != null && !filter.isEmpty()) {
+            users = new ArrayList<>();
+
+            User user = (User) loadUserByUsername(filter);
+            if (user != null) users.add(user);
+        } else {
+            users = findAll();
+        }
+
+        return users;
+    }
+
+    public void saveUser(String username, String password,
+                         Map<String, String> form, Long userId) {
+        User user = findById(userId);
+        user.setUsername(username);
+        user.setPassword(password);
+
+        Set<String> roles = Arrays.stream(Role.values())
+                .map(Role::name)
+                .collect(Collectors.toSet());
+
+        user.getRoles().clear();
+
+        for (String key : form.keySet()) {
+            if (roles.contains(key)) {
+                user.getRoles().add(Role.valueOf(key));
+            }
+        }
+
+        save(user);
+    }
+
+    public void saveUser(String username, String password,
+                         Long userId, MultipartFile file,
+                         Sex gender, String phoneNumber, String dateOfBirth) throws IOException {
+        User user = findById(userId);
+        UserProfile userProfile = user.getUserProfile() == null ?
+                new UserProfile() : userProfileRepo.getOne(user.getUserProfile().getId());
+
+        user.setUsername(username);
+        user.setPassword(password);
+
+        String[] dateArr = dateOfBirth.split("-");
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Integer.parseInt(dateArr[0]), Integer.parseInt(dateArr[1]) - 1, Integer.parseInt(dateArr[2]));
+
+        userProfile.setDateOfBirth(calendar.getTime());
+//        userProfile.setGender(gender);
+        userProfile.setPhoneNumber(phoneNumber);
+
+        userProfile.setUser(user);
+
+        userProfileRepo.save(userProfile);
+
+        user.setUserProfile(userProfile);
+
+        if (file != null && !file.getOriginalFilename().isEmpty()) {
+
+            Files.deleteIfExists(Paths.get(new File(uploadPath + "/" + user.getProfile_pic()).getPath()));
+            Files.deleteIfExists(Paths.get(new File(uploadPath + "/" + "thumb." + user.getProfile_pic()).getPath()));
+
+            String filename = ThumbnailUtil.createFile(file, uploadPath, false);
+
+            user.setProfile_pic(filename);
+        }
+
+        save(user);
+    }
+
+
 }

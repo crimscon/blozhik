@@ -1,8 +1,8 @@
 package com.project.MVC.controller;
 
-import com.project.MVC.model.Color;
 import com.project.MVC.model.Message;
 import com.project.MVC.model.User;
+import com.project.MVC.model.enums.Color;
 import com.project.MVC.service.MessagesService;
 import com.project.MVC.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,7 +1,7 @@
 package com.project.MVC.controller;
 
-import com.project.MVC.model.Role;
 import com.project.MVC.model.User;
+import com.project.MVC.model.enums.Role;
 import com.project.MVC.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

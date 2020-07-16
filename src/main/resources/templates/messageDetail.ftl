@@ -6,6 +6,7 @@
 
     <#include "parts/message/messageSend.ftl">
 
+    <#-- TODO ЗАЙМИСЬ ЭТИМ МОДУЛЕМ -->
     <@msg.detail message author />
 
 </@e.main>

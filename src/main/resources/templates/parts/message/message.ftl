@@ -12,7 +12,7 @@
                 <#if message.author.profile_pic??>
                     <article>
                         <div class="photo">
-                            <img class="personPhoto" alt="" src="/img/${author.profile_pic}">
+                            <img class="personPhoto" alt="" src="/img/thumb.${author.profile_pic}">
                         </div>
                     </article>
                 </#if>
@@ -24,7 +24,7 @@
     <hr>
 
     <!-- Date/Time -->
-    <p>Posted on January 1, 2019 at 12:00 PM</p>
+    <p>Опубликовано ${message.date?date}</p>
 
     <hr>
 

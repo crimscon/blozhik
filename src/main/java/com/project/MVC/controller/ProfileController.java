@@ -1,12 +1,11 @@
 package com.project.MVC.controller;
 
-import com.project.MVC.model.Color;
 import com.project.MVC.model.User;
+import com.project.MVC.model.enums.Color;
+import com.project.MVC.model.enums.Sex;
 import com.project.MVC.service.MessagesService;
 import com.project.MVC.service.UserService;
-import com.project.MVC.util.ThumbnailUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -19,11 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.UUID;
 
 @Controller
 public class ProfileController {
@@ -32,9 +27,6 @@ public class ProfileController {
 
     @Autowired
     private MessagesService messagesService;
-
-    @Value("${upload.path}")
-    private String uploadPath;
 
     @GetMapping("{username}/profile")
     public String userProfile(@PathVariable String username,
@@ -49,7 +41,7 @@ public class ProfileController {
             model.addAttribute("colors", Color.values());
         }
 
-        model.addAttribute("userProfile", user);
+        model.addAttribute("currentUser", user);
 
         return "User/userProfile";
     }
@@ -76,33 +68,16 @@ public class ProfileController {
     public String userSave(
             @RequestParam String username,
             @RequestParam String password,
+            @RequestParam(required = false) Sex gender,
+            @RequestParam(required = false) String phoneNumber,
+            @RequestParam(required = false) String dateofBirth,
             @RequestParam("userId") Long userId,
             @RequestParam("profile_pic") MultipartFile file
     ) throws IOException {
 
-        User user = userService.findById(userId);
-        user.setUsername(username);
-        user.setPassword(password);
+        userService.saveUser(username, password, userId, file, gender, phoneNumber, dateofBirth);
 
-        if (file != null && !file.getOriginalFilename().isEmpty()) {
-
-            Files.deleteIfExists(Paths.get(new File(uploadPath + "/" + user.getProfile_pic()).getPath()));
-            File uploadDir = new File(uploadPath);
-
-            if (!uploadDir.exists()) uploadDir.mkdir();
-
-            String uuid = UUID.randomUUID().toString();
-            String filename = uuid + "." + file.getOriginalFilename();
-
-            file.transferTo(new File(uploadPath + "/" + filename));
-            ThumbnailUtil.createThumbnail(uploadPath + "/" + filename);
-
-            user.setProfile_pic(filename);
-        }
-
-        userService.save(user);
-
-        return "redirect:/{username}/profile";
+        return "redirect:/" + username + "/profile";
     }
 
 
