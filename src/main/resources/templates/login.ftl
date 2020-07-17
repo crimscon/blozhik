@@ -1,7 +1,6 @@
-<#import "/parts/bootstrap.ftl" as e>
-<#import "/parts/login.ftl" as l>
+<#import "parts/bootstrap.ftl" as e>
+<#import "parts/login.ftl" as l>
 
-<@e.main false>
-<@l.login "/login" />
-
+<@e.main false messageSend??>
+    <@l.login "/login" />
 </@e.main>

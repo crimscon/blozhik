@@ -20,16 +20,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .authorizeRequests()
-                .antMatchers("/", "/registration").permitAll()
-                .anyRequest().authenticated()
+                    .authorizeRequests()
+                    .antMatchers("/",
+                            "/registration",
+                            "/static/**").permitAll()
+                    .anyRequest().authenticated()
                 .and()
-                .formLogin()
-                .loginPage("/login")
-                .permitAll()
+                    .rememberMe()
                 .and()
-                .logout()
-                .permitAll();
+                    .formLogin()
+                    .loginPage("/login")
+                    .permitAll()
+                .and()
+                    .logout()
+                    .permitAll();
     }
 
     @Override
@@ -37,4 +41,5 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         auth.userDetailsService(userService)
                 .passwordEncoder(NoOpPasswordEncoder.getInstance());
     }
+
 }

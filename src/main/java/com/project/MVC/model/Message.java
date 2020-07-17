@@ -1,10 +1,15 @@
 package com.project.MVC.model;
 
+import com.project.MVC.model.enums.Color;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Data
@@ -15,17 +20,55 @@ public class Message {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(length = 300)
+    @Column(columnDefinition = "text", length = 300)
     private String title;
 
-    @Column(length = 500)
+    @Column(columnDefinition = "text", length = 300)
+    private String announce;
+
+    @Column(columnDefinition = "text")
     private String text;
 
-    private User author;
+    @Enumerated(EnumType.STRING)
+    private Color color;
 
-    public Message(String title, String text, User author) {
+    @Temporal(TemporalType.DATE)
+    private Date date;
+
+    @ManyToMany
+    @JoinTable(
+            name = "message_likes",
+            joinColumns = { @JoinColumn(name = "message_id") },
+            inverseJoinColumns = { @JoinColumn(name = "user_id")}
+    )
+    private Set<User> likes = new HashSet<>();
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id")
+    private User author;
+    private String filename;
+
+    public Message(String title, String text, User author, Color color) {
+        this.date = new Date();
         this.title = title;
         this.text = text;
+        this.announce = createAnnounce(text);
         this.author = author;
+        this.color = color;
+
+    }
+
+    private String createAnnounce(String text) {
+        String[] textArray = text.split(" ");
+        if (textArray.length == 1) return text.substring(0, Math.min(text.length(), 300));
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        Arrays.stream(textArray).filter(s -> (stringBuilder.length() + s.length() + 3) <= 300).forEach(s -> stringBuilder.append(s).append(" "));
+
+        stringBuilder.trimToSize();
+        stringBuilder.append("...");
+
+        return stringBuilder.toString();
     }
 }

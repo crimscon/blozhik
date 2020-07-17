@@ -1,16 +1,16 @@
 <#assign
-    session = Session.SPRING_SECURITY_CONTEXT??
+session = Session.SPRING_SECURITY_CONTEXT??
 >
 
 <#if session>
     <#assign
-        user = Session.SPRING_SECURITY_CONTEXT.authentication.principal
-        name = user.getUsername()
-        isAdmin = user.isAdmin()
+    user = Session.SPRING_SECURITY_CONTEXT.authentication.principal
+    name = user.getUsername()
+    isAdmin = user.isAdmin()
     >
 <#else>
     <#assign
-        name = ""
-        isAdmin = false
+    name = ""
+    isAdmin = false
     >
 </#if>
