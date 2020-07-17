@@ -3,9 +3,6 @@
 
 
 <#macro message page>
-
-    <#include "messageSend.ftl">
-
     <div class="card-columns mt-3">
     <#list page.content as message>
         <#if message.filename?? && message.title != "" && message.announce != "">

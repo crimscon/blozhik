@@ -3,7 +3,6 @@ package com.project.MVC.controller;
 import com.project.MVC.model.User;
 import com.project.MVC.model.enums.Role;
 import com.project.MVC.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,8 +14,11 @@ import java.util.Set;
 
 @Controller
 public class RegistrationController {
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+
+    public RegistrationController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping("/registration")
     public String registration() {

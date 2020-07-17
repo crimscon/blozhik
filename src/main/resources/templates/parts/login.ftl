@@ -104,9 +104,18 @@
 </#macro>
 
 <#macro logout>
-    <form action="/logout" method="post" class="form-inline">
-        <a href="../../${name}/profile" class="btn btn-link text-light">${name}</a>
-        <input type="hidden" name="_csrf" value="${_csrf.token}"/>
-        <button class="btn btn-outline-light my-2 my-sm-0" type="submit"><i class="fas fa-sign-out-alt"></i></button>
-    </form>
+    <#if user??>
+        <form action="/logout" method="post" class="form-inline">
+            <a href="../../${user.getUsername()}/profile" class="btn btn-link text-light">${name}
+            <#if user.getProfile_pic()??>
+                <img src="/img/thumbs/${user.getProfile_pic()}" class="rounded-circle ml-2 mr-2">
+            </#if>
+            </a>
+            <input type="hidden" name="_csrf" value="${_csrf.token}"/>
+            <button class="btn btn-outline-light my-2 my-sm-0" type="submit"><i class="fas fa-sign-out-alt"></i>
+            </button>
+        </form>
+    <#else>
+        <a href="../../login" class="btn btn-outline-light my-2 my-sm-0">Войти <i class="fas fa-sign-in-alt"></i></a>
+    </#if>
 </#macro>

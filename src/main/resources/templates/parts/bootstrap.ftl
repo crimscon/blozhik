@@ -1,4 +1,4 @@
-<#macro main navbar>
+<#macro main navbar messageSend>
     <!DOCTYPE html>
     <html>
     <head>
@@ -22,6 +22,9 @@
             <#nested>
         </div>
     </div>
+    <#if messageSend>
+        <#include "../parts/message/messageSend.ftl">
+    </#if>
     <!--JavaScript at end of body for optimized loading-->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
             integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"

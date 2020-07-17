@@ -7,7 +7,6 @@ import com.project.MVC.model.enums.Sex;
 import com.project.MVC.repository.UserProfileRepository;
 import com.project.MVC.repository.UserRepository;
 import com.project.MVC.util.ThumbnailUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -15,43 +14,31 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class UserService implements UserDetailsService {
-    @Autowired
-    private UserRepository userRepo;
+    private final UserRepository userRepo;
 
-    @Autowired
-    private UserProfileRepository userProfileRepo;
+    private final UserProfileRepository userProfileRepo;
 
     @Value("${upload.path}")
     private String uploadPath;
+
+    public UserService(UserRepository userRepo, UserProfileRepository userProfileRepo) {
+        this.userRepo = userRepo;
+        this.userProfileRepo = userProfileRepo;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepo.findByUsernameIgnoreCase(username);
     }
 
-    public <S extends User> void save(S s) {
-        userRepo.save(s);
-    }
-
     public User findById(Long aLong) {
         return userRepo.getOne(aLong);
-    }
-
-    public List<User> findAll() {
-        return userRepo.findAll();
-    }
-
-    public void deleteById(Long id) {
-        userRepo.deleteById(id);
     }
 
     public List<User> getUserList(String filter) {
@@ -63,7 +50,7 @@ public class UserService implements UserDetailsService {
             User user = (User) loadUserByUsername(filter);
             if (user != null) users.add(user);
         } else {
-            users = findAll();
+            users = userRepo.findAll();
         }
 
         return users;
@@ -87,47 +74,86 @@ public class UserService implements UserDetailsService {
             }
         }
 
-        save(user);
+        userRepo.save(user);
     }
 
-    public void saveUser(String username, String password,
-                         Long userId, MultipartFile file,
+    public void saveUser(User user, String password,
+                         MultipartFile file,
                          Sex gender, String phoneNumber, String dateOfBirth) throws IOException {
-        User user = findById(userId);
         UserProfile userProfile = user.getUserProfile() == null ?
                 new UserProfile() : userProfileRepo.getOne(user.getUserProfile().getId());
 
-        user.setUsername(username);
-        user.setPassword(password);
+        boolean passwordChange = false,
+                profilePicChange = false,
+                phoneChange = false,
+                dofChange = false,
+                profileChange = false;
+
+        if (!user.getPassword().equals(password)) {
+            passwordChange = true;
+            user.setPassword(password);
+        }
 
         if (!dateOfBirth.equals("")) {
             String[] dateArr = dateOfBirth.split("-");
             Calendar calendar = Calendar.getInstance();
             calendar.set(Integer.parseInt(dateArr[0]), Integer.parseInt(dateArr[1]) - 1, Integer.parseInt(dateArr[2]));
 
-            userProfile.setDateOfBirth(calendar.getTime());
+            if (!userProfile.getDateOfBirth().equals(calendar.getTime())) {
+                dofChange = true;
+                userProfile.setDateOfBirth(calendar.getTime());
+            }
         }
-//        userProfile.setGender(gender);
-        userProfile.setPhoneNumber(phoneNumber);
 
-        userProfile.setUser(user);
+        if (!userProfile.getPhoneNumber().equals(phoneNumber)) {
+            phoneChange = true;
+            userProfile.setPhoneNumber(phoneNumber);
+        }
 
-        userProfileRepo.save(userProfile);
+        if (phoneChange || dofChange) {
+            profileChange = true;
+            userProfile.setUser(user);
+        }
 
-        user.setUserProfile(userProfile);
+        if (profileChange) {
+            userProfileRepo.save(userProfile);
+            user.setUserProfile(userProfile);
+        }
 
         if (file != null && !file.getOriginalFilename().isEmpty()) {
 
-            Files.deleteIfExists(Paths.get(new File(uploadPath + "/" + user.getProfile_pic()).getPath()));
-            Files.deleteIfExists(Paths.get(new File(uploadPath + "/" + "thumb." + user.getProfile_pic()).getPath()));
-
+            ThumbnailUtil.deleteIfExistFile(uploadPath, user.getProfile_pic());
             String filename = ThumbnailUtil.createFile(file, uploadPath, false);
 
             user.setProfile_pic(filename);
+            profilePicChange = true;
         }
 
-        save(user);
+        if (passwordChange || profilePicChange || profileChange) userRepo.save(user);
     }
 
 
+    public List<User> findAll() {
+        return userRepo.findAll();
+    }
+
+    public void save(User user) {
+        userRepo.save(user);
+    }
+
+    public void deleteUser(User user) throws IOException {
+
+        UserProfile userProfile = user.getUserProfile();
+
+        if (userProfile != null) {
+            userProfileRepo.delete(userProfile);
+        }
+        if (!(user.getProfile_pic() == null || user.getProfile_pic().isEmpty())) {
+            ThumbnailUtil.deleteIfExistFile(uploadPath, user.getProfile_pic());
+        }
+
+        userRepo.delete(user);
+
+
+    }
 }

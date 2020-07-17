@@ -6,7 +6,10 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Data
@@ -31,6 +34,17 @@ public class Message {
 
     @Temporal(TemporalType.DATE)
     private Date date;
+
+    @ManyToMany
+    @JoinTable(
+            name = "message_likes",
+            joinColumns = { @JoinColumn(name = "message_id") },
+            inverseJoinColumns = { @JoinColumn(name = "user_id")}
+    )
+    private Set<User> likes = new HashSet<>();
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id")
     private User author;
     private String filename;
 
@@ -41,6 +55,7 @@ public class Message {
         this.announce = createAnnounce(text);
         this.author = author;
         this.color = color;
+
     }
 
     private String createAnnounce(String text) {
@@ -49,10 +64,7 @@ public class Message {
 
         StringBuilder stringBuilder = new StringBuilder();
 
-        for (String s : textArray)
-            if ((stringBuilder.length() + s.length() + 3) <= 300) {
-                stringBuilder.append(s).append(" ");
-            }
+        Arrays.stream(textArray).filter(s -> (stringBuilder.length() + s.length() + 3) <= 300).forEach(s -> stringBuilder.append(s).append(" "));
 
         stringBuilder.trimToSize();
         stringBuilder.append("...");

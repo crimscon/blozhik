@@ -1,44 +1,124 @@
 package com.project.MVC.controller;
 
 import com.project.MVC.model.User;
+import com.project.MVC.model.dto.MessageDto;
 import com.project.MVC.model.enums.Role;
+import com.project.MVC.model.enums.Sex;
+import com.project.MVC.service.MessagesService;
 import com.project.MVC.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/users")
-@PreAuthorize("hasAuthority('ADMIN')")
 public class UserController {
-    @Autowired
-    private UserService userService;
 
-    @GetMapping
+    private final UserService userService;
+    private final MessagesService messagesService;
+
+    public UserController(UserService userService, MessagesService messagesService) {
+        this.userService = userService;
+        this.messagesService = messagesService;
+    }
+
+    @GetMapping("{username}/profile")
+    public String getProfile(@AuthenticationPrincipal User currentUser,
+                             @PathVariable String username,
+                             Model model) {
+        User user = (User) userService.loadUserByUsername(username);
+        model.addAttribute("profile", user);
+        model.addAttribute("isCurrentUser", currentUser.equals(user));
+        model.addAttribute("url", "/profile");
+
+        MessagesController.addMessageSendPart(model);
+
+        return "user/userProfile";
+    }
+
+    @GetMapping("{username}/messages")
+    public String getUserMessages(@AuthenticationPrincipal User currentUser,
+                                  @PathVariable String username,
+                                  @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable,
+                                  Model model) {
+        User user = (User) userService.loadUserByUsername(username);
+
+        Page<MessageDto> page = messagesService.messageListForUser(pageable, user, currentUser);
+
+        model.addAttribute("profile", user);
+        model.addAttribute("page", page);
+        model.addAttribute("isCurrentUser", currentUser.equals(user));
+        model.addAttribute("url", "/messages");
+
+        MessagesController.addMessageSendPart(model);
+
+        return "user/userMessages";
+    }
+
+    @GetMapping("{username}/edit")
+    public String getEditForm(@AuthenticationPrincipal User currentUser,
+                              @PathVariable String username,
+                              Model model) {
+        User user = (User) userService.loadUserByUsername(username);
+
+        if (currentUser.equals(user)) {
+            model.addAttribute("profile", currentUser);
+            model.addAttribute("url", "/edit");
+            model.addAttribute("isCurrentUser", currentUser.equals(user));
+
+            return "user/userEdit";
+        }
+        else return "redirect:/{username}/profile";
+    }
+
+    @PostMapping("{username}/edit")
+    public String saveEditForm(@RequestParam String password,
+                               @RequestParam(required = false) Sex gender,
+                               @RequestParam(required = false) String phoneNumber,
+                               @RequestParam(required = false) String dateOfBirth,
+                               @RequestParam("profile_pic") MultipartFile file,
+                               @AuthenticationPrincipal User user) throws IOException {
+        userService.saveUser(user, password, file, gender, phoneNumber, dateOfBirth);
+
+        return "redirect:/{username}/profile";
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/users")
     public String userList(@RequestParam(required = false, defaultValue = "") String filter, Model model) {
         List<User> users = userService.getUserList(filter);
 
         model.addAttribute("users", users);
         model.addAttribute("filter", filter);
 
-        return "User/userList";
+        return "user/admin/userList";
     }
 
-    @GetMapping("{userId}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/users/{userId}")
     public String userEditForm(@PathVariable Long userId, Model model) {
         User user = userService.findById(userId);
         model.addAttribute("user", user);
         model.addAttribute("roles", Role.values());
 
-        return "User/userEdit";
+        return "user/admin/userEdit";
     }
 
-    @PostMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping("/users")
     public String userSave(
             @RequestParam String username,
             @RequestParam String password,
@@ -50,12 +130,12 @@ public class UserController {
         return "redirect:/users";
     }
 
-    @PostMapping("delete")
-    public String deleteUser(@RequestParam Long userId) {
-        userService.deleteById(userId);
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping("/users/delete")
+    public String deleteUser(@RequestParam(name = "userId") User user) throws IOException {
+        userService.deleteUser(user);
 
         return "redirect:/users";
     }
-
 
 }

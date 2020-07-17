@@ -2,10 +2,7 @@
 <#import "parts/message/message.ftl" as msg>
 <#include "parts/security.ftl">
 
-<@e.main true>
-
-    <#include "parts/message/messageSend.ftl">
-
+<@e.main true messageSend??>
     <#-- TODO ЗАЙМИСЬ ЭТИМ МОДУЛЕМ -->
     <@msg.detail message author />
 

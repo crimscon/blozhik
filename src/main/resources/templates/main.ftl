@@ -2,7 +2,7 @@
 <#import "parts/message/messageList.ftl" as m>
 <#include "parts/security.ftl">
 
-<@e.main true>
+<@e.main true messageSend??>
     <div class="col-sm-12 col-md-12 col-lg-12">
         <@m.message page />
     </div>

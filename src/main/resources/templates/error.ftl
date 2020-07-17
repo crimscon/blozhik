@@ -1,6 +1,6 @@
 <#import "parts/bootstrap.ftl" as e>
 
-<@e.main false>
+<@e.main false messageSend??>
     <div class="d-flex justify-content-center align-items-center" style="height:100vh;width: 100vw" id="main">
         <#if code??>
             <h1 class="mr-3 pr-3 align-top border-right inline-block align-content-center">${code}</h1>

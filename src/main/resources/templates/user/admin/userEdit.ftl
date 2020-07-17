@@ -1,6 +1,6 @@
-<#import "../parts/bootstrap.ftl" as e>
+<#import "../../parts/bootstrap.ftl" as e>
 
-<@e.main true>
+<@e.main true messageSend??>
 
     <form action="/users" class="mt-2" method="post">
         <div class="form-row">

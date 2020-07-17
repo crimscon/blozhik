@@ -8,6 +8,8 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.UUID;
 
 public class ThumbnailUtil {
@@ -17,14 +19,15 @@ public class ThumbnailUtil {
 
         File uploadDir = new File(uploadPath);
         File thumbnails = new File(uploadPath + "/thumbs/");
+
         if (!thumbnails.exists()) thumbnails.mkdir();
 
         if (isMessage) {
-            Thumbnails.of(uploadDir.getAbsolutePath() + "\\" + filename).scale(0.75).toFile(uploadDir.getAbsolutePath() + "\\" + filename);
-            Thumbnails.of(uploadDir.getAbsolutePath() + "\\" + filename).scale(0.25).toFile(thumbnails.getAbsolutePath() + "\\" + filename);
+            Thumbnails.of(uploadDir.getAbsolutePath() + "\\" + filename).scale(0.75).toFile(thumbnails.getAbsolutePath() + "\\" + filename);
+            Thumbnails.of(uploadDir.getAbsolutePath() + "\\" + filename).scale(1).toFile(uploadDir.getAbsolutePath() + "\\" + filename);
         } else {
-            BufferedImage bufferedImage = ImageIO.read(new File(uploadDir.getAbsolutePath() + "\\" + filename));
 
+            BufferedImage bufferedImage = ImageIO.read(new File(uploadDir.getAbsolutePath() + "\\" + filename));
             int maxSize = Math.min(bufferedImage.getHeight(), bufferedImage.getWidth());
 
             Thumbnails.of(uploadDir.getAbsolutePath() + "\\" + filename).sourceRegion(Positions.CENTER, maxSize, maxSize)
@@ -44,6 +47,11 @@ public class ThumbnailUtil {
         ThumbnailUtil.createThumbnail(filename, uploadPath, isMessage);
 
         return filename;
+    }
+
+    public static void deleteIfExistFile(String uploadPath, String filename) throws IOException {
+        Files.deleteIfExists(Paths.get(uploadPath + "/" + filename));
+        Files.deleteIfExists(Paths.get(uploadPath + "/thumb/" + filename));
     }
 
 }

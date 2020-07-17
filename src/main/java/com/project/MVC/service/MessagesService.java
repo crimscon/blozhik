@@ -2,45 +2,29 @@ package com.project.MVC.service;
 
 import com.project.MVC.model.Message;
 import com.project.MVC.model.User;
+import com.project.MVC.model.dto.MessageDto;
 import com.project.MVC.model.enums.Color;
 import com.project.MVC.repository.MessagesRepository;
 import com.project.MVC.util.ThumbnailUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Calendar;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class MessagesService {
 
-    @Autowired
-    private MessagesRepository messagesRepository;
+    private final MessagesRepository messagesRepository;
 
     @Value("${upload.path}")
     private String uploadPath;
 
-    public Page<Message> findByAuthor(Long userId, Pageable pageable) {
-        List<Message> messages = messagesRepository.findAll().stream().
-                filter(message -> message.getAuthor().getId().equals(userId)).
-                collect(Collectors.toList());
-
-        int start = (int) pageable.getOffset(),
-                end = Math.min((start + pageable.getPageSize()), messages.size());
-
-        return new PageImpl<Message>(messages.subList(start, end), pageable, messages.size());
-
+    public MessagesService(MessagesRepository messagesRepository) {
+        this.messagesRepository = messagesRepository;
     }
 
     public void createMessage(String title,
@@ -61,49 +45,31 @@ public class MessagesService {
         if (message.getFilename() != null ||
                 !message.getTitle().isEmpty() ||
                 !message.getText().isEmpty()) {
-            save(message);
-        } else Files.deleteIfExists(Paths.get(new File(uploadPath + "/" + message.getFilename()).getPath()));
+            messagesRepository.save(message);
+        } else ThumbnailUtil.deleteIfExistFile(uploadPath, message.getFilename());
     }
 
-    public <S extends Message> void save(S s) {
-        messagesRepository.save(s);
-    }
 
     public Message findById(Long id) {
         return messagesRepository.getOne(id);
     }
 
-    public Page<Message> findAll(Pageable pageable) {
-        return messagesRepository.findAll(pageable);
-    }
-
-    public void deleteById(Long id) {
-        messagesRepository.deleteById(id);
-    }
-
-    public void delete(Message message) {
-        messagesRepository.delete(message);
-    }
-
-    public boolean deleteMessage(Long id) throws IOException {
+    public boolean deleteMessage(Long id, User currentUser) throws IOException {
         Message message = findById(id);
-        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if (currentUser.getId().equals(message.getAuthor().getId())) {
             if (message.getFilename() != null) {
-                Files.deleteIfExists(Paths.get(new File(uploadPath + "/" + message.getFilename()).getPath()));
+                ThumbnailUtil.deleteIfExistFile(uploadPath, message.getFilename());
             }
 
-            delete(message);
+            messagesRepository.delete(message);
 
             return true;
         }
         return false;
     }
 
-    public boolean availableEdit(Message message) {
-        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
+    public boolean availableEdit(Message message, User currentUser) {
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.SECOND, 20);
 
@@ -123,6 +89,14 @@ public class MessagesService {
             message.setTitle(title);
         }
 
-        save(message);
+        messagesRepository.save(message);
+    }
+
+    public Page<MessageDto> messageListForUser(Pageable pageable, User author, User currentUser) {
+        return messagesRepository.findByUser(pageable, author, currentUser);
+    }
+
+    public Page<MessageDto> findAll(Pageable pageable, User user) {
+        return messagesRepository.findAll(pageable, user);
     }
 }

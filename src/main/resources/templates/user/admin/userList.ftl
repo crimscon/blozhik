@@ -1,6 +1,6 @@
-<#import "../parts/bootstrap.ftl" as e>
+<#import "../../parts/bootstrap.ftl" as e>
 
-<@e.main true>
+<@e.main true messageSend??>
     <div class="col-sm-12 col-md-12 col-lg-12">
         <form method="get" action="/users">
             <div class="input-group mt-3">

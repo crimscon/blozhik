@@ -5,7 +5,6 @@ import com.project.MVC.model.User;
 import com.project.MVC.model.enums.Color;
 import com.project.MVC.service.MessagesService;
 import com.project.MVC.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -23,21 +22,27 @@ import java.io.IOException;
 @Controller
 public class MessagesController {
 
-    @Autowired
-    private MessagesService messagesService;
+    private final MessagesService messagesService;
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+
+    public MessagesController(MessagesService messagesService, UserService userService) {
+        this.messagesService = messagesService;
+        this.userService = userService;
+    }
 
     @GetMapping("/messages")
     public String getMessages(Model model,
-                              @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) {
-        model.addAttribute("page", messagesService.findAll(pageable));
+                              @AuthenticationPrincipal User user,
+                              @PageableDefault(sort = {"id"},
+                                      direction = Sort.Direction.DESC) Pageable pageable) {
+        model.addAttribute("page", messagesService.findAll(pageable, user));
         model.addAttribute("url", "/messages");
 
         addMessageSendPart(model);
         return "main";
     }
+
 
     @PostMapping("/add")
     public String addMessage(@RequestParam(defaultValue = "") String title,
@@ -50,8 +55,9 @@ public class MessagesController {
     }
 
     @GetMapping("/messages/{id}/delete")
-    public String deleteMessage(@PathVariable Long id) throws IOException {
-        return messagesService.deleteMessage(id) ? "redirect:/messages" : "redirect:/messages/" + id;
+    public String deleteMessage(@PathVariable Long id,
+                                @AuthenticationPrincipal User user) throws IOException {
+        return messagesService.deleteMessage(id, user) ? "redirect:/messages" : "redirect:/messages/" + id;
     }
 
     @PostMapping("messages/{id}/edit")
@@ -64,24 +70,29 @@ public class MessagesController {
     }
 
     @GetMapping("/messages/{id}")
-    public String getMessage(@PathVariable Long id, Model model) {
+    public String getMessage(@PathVariable Long id,
+                             @AuthenticationPrincipal User currentUser,
+                             Model model) {
         Message message = messagesService.findById(id);
         model.addAttribute("message", message);
         model.addAttribute("author", userService.findById(message.getAuthor().getId()));
         model.addAttribute("edit", false);
-        model.addAttribute("availableEdit", messagesService.availableEdit(message));
+        model.addAttribute("availableEdit", messagesService.availableEdit(message, currentUser));
 
         addMessageSendPart(model);
 
         return "messageDetail";
     }
 
-    private void addMessageSendPart(Model model) {
+    public static void addMessageSendPart(Model model) {
+        model.addAttribute("messageSend", true);
         model.addAttribute("colors", Color.values());
     }
 
     @GetMapping("messages/{id}/edit")
-    public String getEditForm(@PathVariable Long id, Model model) {
+    public String getEditForm(@PathVariable Long id,
+                              @AuthenticationPrincipal User currentUser,
+                              Model model) {
         Message message = messagesService.findById(id);
 
         model.addAttribute("message", message);
@@ -89,7 +100,7 @@ public class MessagesController {
 
         addMessageSendPart(model);
 
-        return messagesService.availableEdit(message) ? "messageDetail" : "redirect:/messages/" + id;
+        return messagesService.availableEdit(message, currentUser) ? "messageDetail" : "redirect:/messages/" + id;
     }
 
 }
