@@ -100,11 +100,13 @@ public class UserService implements UserDetailsService {
         user.setUsername(username);
         user.setPassword(password);
 
-        String[] dateArr = dateOfBirth.split("-");
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Integer.parseInt(dateArr[0]), Integer.parseInt(dateArr[1]) - 1, Integer.parseInt(dateArr[2]));
+        if (!dateOfBirth.equals("")) {
+            String[] dateArr = dateOfBirth.split("-");
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Integer.parseInt(dateArr[0]), Integer.parseInt(dateArr[1]) - 1, Integer.parseInt(dateArr[2]));
 
-        userProfile.setDateOfBirth(calendar.getTime());
+            userProfile.setDateOfBirth(calendar.getTime());
+        }
 //        userProfile.setGender(gender);
         userProfile.setPhoneNumber(phoneNumber);
 

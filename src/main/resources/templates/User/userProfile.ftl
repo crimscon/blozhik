@@ -8,7 +8,6 @@
     <#if currentUser.getUserProfile()??>
         <#assign
         userPhone = currentUser.getUserProfile().getPhoneNumber()
-        userDoB = currentUser.getUserProfile().getDateOfBirth()
         userSex = ""
         >
     <#else>
@@ -75,14 +74,19 @@
                     </div>
                     <div class="form-group col-md-4">
                         <label for="dob">Date of birth</label>
-                        <input type="date" class="form-control" id="dob" name="dateofBirth"
-                               value="${userDoB?date?iso_m("GMT+03")}">
+                        <#if currentUser.getUserProfile().getDateOfBirth()??>
+                            <input type="date" class="form-control" id="dob" name="dateofBirth"
+                                   value="${currentUser.getUserProfile().getDateOfBirth()?date?iso_m("GMT+03")}">
+                        <#else>
+                            <input type="date" class="form-control" id="dob" name="dateofBirth"
+                                   >
+                        </#if>
                     </div>
                     <#-- TODO доделать пол!! -->
-<#--                    <div class="custom-control custom-switch">-->
-<#--                        <input type="checkbox" class="custom-control-input" id="customSwitch1">-->
-<#--                        <label class="custom-control-label" for="customSwitch1">Toggle this switch element</label>-->
-<#--                    </div>-->
+                    <#--                    <div class="custom-control custom-switch">-->
+                    <#--                        <input type="checkbox" class="custom-control-input" id="customSwitch1">-->
+                    <#--                        <label class="custom-control-label" for="customSwitch1">Toggle this switch element</label>-->
+                    <#--                    </div>-->
                 </div>
                 <div class="input-group mb-3">
                     <div class="custom-file">
