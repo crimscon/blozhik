@@ -11,6 +11,10 @@ input[type="radio"] + label {
     width: 100%;
 }
 
+.stretched-link::after {
+    z-index: 0;
+}
+
 input[type="radio"] + label span {
     display: inline-block;
     width: 18px;

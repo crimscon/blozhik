@@ -6,6 +6,6 @@
     <#include "../parts/user/userBlock.ftl">
     <div class="col-sm-12 col-md-12 col-lg-8">
         <#include "../parts/user/userNav.ftl">
-        <@m.message page />
+        <@m.message page 2 />
     </div>
 </@e.main>

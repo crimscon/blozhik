@@ -74,11 +74,12 @@
             <label for="username"></label>
         </div>
 
-        <!--    <div class="form-label-group">-->
-        <!--        <input type="email" id="email" name="email" class="form-control" placeholder="E-mail" required=""-->
-        <!--               autofocus="autofocus" autocomplete="off">-->
-        <!--        <label for="email"></label>-->
-        <!--    </div>-->
+        <div class="form-label-group">
+            <input type="email" id="email" name="email" class="form-control" placeholder="E-mail"
+                   required="required"
+                   autocomplete="off">
+            <label for="email"></label>
+        </div>
 
         <div class="form-label-group">
             <input type="password" id="inputPassword" name="password" class="form-control" placeholder="Password"
@@ -106,9 +107,9 @@
 <#macro logout>
     <#if user??>
         <form action="/logout" method="post" class="form-inline">
-            <a href="../../${user.getUsername()}/profile" class="btn btn-link text-light">${name}
+            <a href="../../${user.getUsername()}/profile" class="btn btn-link text-light pr-1 mr-2 text-decoration-none">${name}
             <#if user.getProfile_pic()??>
-                <img src="/img/thumbs/${user.getProfile_pic()}" class="rounded-circle ml-2 mr-2">
+                <img src="/img/thumbs/${user.getProfile_pic()}" class="rounded-circle mx-2">
             </#if>
             </a>
             <input type="hidden" name="_csrf" value="${_csrf.token}"/>

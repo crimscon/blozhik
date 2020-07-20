@@ -4,6 +4,7 @@ import com.project.MVC.model.Message;
 import com.project.MVC.model.User;
 import com.project.MVC.model.dto.MessageDto;
 import com.project.MVC.model.enums.Color;
+import com.project.MVC.model.enums.Role;
 import com.project.MVC.repository.MessagesRepository;
 import com.project.MVC.util.ThumbnailUtil;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,7 +14,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Calendar;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.Set;
 
 @Service
 public class MessagesService {
@@ -36,9 +40,7 @@ public class MessagesService {
         Message message = new Message(title, text, user, color);
 
         if (file != null && !file.getOriginalFilename().isEmpty()) {
-
             String filename = ThumbnailUtil.createFile(file, uploadPath, true);
-
             message.setFilename(filename);
         }
 
@@ -50,36 +52,38 @@ public class MessagesService {
     }
 
 
+    public MessageDto findById(User user, Long id) {
+        return messagesRepository.findById(id, user);
+    }
+
     public Message findById(Long id) {
         return messagesRepository.getOne(id);
     }
 
     public boolean deleteMessage(Long id, User currentUser) throws IOException {
-        Message message = findById(id);
+        MessageDto message = findById(currentUser, id);
 
-        if (currentUser.getId().equals(message.getAuthor().getId())) {
+        if (currentUser.getId().equals(message.getAuthor().getId()) || currentUser.getRoles().contains(Role.ADMIN)) {
             if (message.getFilename() != null) {
                 ThumbnailUtil.deleteIfExistFile(uploadPath, message.getFilename());
             }
 
-            messagesRepository.delete(message);
+            messagesRepository.delete(messagesRepository.getOne(message.getId()));
 
             return true;
         }
         return false;
     }
 
-    public boolean availableEdit(Message message, User currentUser) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.SECOND, 20);
-
-        return message.getDate() != null
+    public boolean availableEdit(MessageDto message, User currentUser) {
+        return (message.getDate() != null
                 && message.getAuthor().getId().equals(currentUser.getId())
-                && !message.getDate().after(calendar.getTime());
+                && message.getDate().plusDays(1).isAfter(LocalDateTime.now()))
+                || currentUser.getRoles().contains(Role.ADMIN);
     }
 
-    public void editMessage(Long id, String title, String text) {
-        Message message = findById(id);
+    public void editMessage(User user, Long id, String title, String text) {
+        Message message = messagesRepository.getOne(id);
 
         if (!message.getText().equals(text)) {
             message.setText(text);
@@ -98,5 +102,30 @@ public class MessagesService {
 
     public Page<MessageDto> findAll(Pageable pageable, User user) {
         return messagesRepository.findAll(pageable, user);
+    }
+
+    public void addViewers(MessageDto messageDto) {
+        Message message = messagesRepository.getOne(messageDto.getId());
+
+        long viewers = message.getViewers() + 1;
+        message.setViewers(viewers);
+
+        messagesRepository.save(message);
+    }
+
+    public Object convertDate(LocalDateTime date) {
+        return Date.from(date.atZone(ZoneId.systemDefault()).toInstant());
+    }
+
+    public void like(User user, Long id) {
+        Message message = findById(id);
+        Set<User> likes = message.getLikes();
+
+        if (likes.contains(user))
+            likes.remove(user);
+        else
+            likes.add(user);
+
+        messagesRepository.save(message);
     }
 }

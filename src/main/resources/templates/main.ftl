@@ -4,6 +4,6 @@
 
 <@e.main true messageSend??>
     <div class="col-sm-12 col-md-12 col-lg-12">
-        <@m.message page />
+        <@m.message page 3 />
     </div>
 </@e.main>

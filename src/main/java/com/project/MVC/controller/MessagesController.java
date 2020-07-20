@@ -1,7 +1,7 @@
 package com.project.MVC.controller;
 
-import com.project.MVC.model.Message;
 import com.project.MVC.model.User;
+import com.project.MVC.model.dto.MessageDto;
 import com.project.MVC.model.enums.Color;
 import com.project.MVC.service.MessagesService;
 import com.project.MVC.service.UserService;
@@ -11,11 +11,11 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 
@@ -61,10 +61,11 @@ public class MessagesController {
     }
 
     @PostMapping("messages/{id}/edit")
-    public String editMessage(@PathVariable Long id,
+    public String editMessage(@AuthenticationPrincipal User user,
+                              @PathVariable Long id,
                               @RequestParam String title,
                               @RequestParam String text) {
-        messagesService.editMessage(id, title, text);
+        messagesService.editMessage(user, id, title, text);
 
         return "redirect:/messages/" + id;
     }
@@ -73,11 +74,15 @@ public class MessagesController {
     public String getMessage(@PathVariable Long id,
                              @AuthenticationPrincipal User currentUser,
                              Model model) {
-        Message message = messagesService.findById(id);
+        MessageDto message = messagesService.findById(currentUser, id);
+
+        messagesService.addViewers(message);
+
         model.addAttribute("message", message);
+        model.addAttribute("convertedDateMessage", messagesService.convertDate(message.getDate()));
         model.addAttribute("author", userService.findById(message.getAuthor().getId()));
-        model.addAttribute("edit", false);
-        model.addAttribute("availableEdit", messagesService.availableEdit(message, currentUser));
+        model.addAttribute("availableEdit",
+                messagesService.availableEdit(message, currentUser));
 
         addMessageSendPart(model);
 
@@ -93,14 +98,29 @@ public class MessagesController {
     public String getEditForm(@PathVariable Long id,
                               @AuthenticationPrincipal User currentUser,
                               Model model) {
-        Message message = messagesService.findById(id);
+        MessageDto message = messagesService.findById(currentUser, id);
 
         model.addAttribute("message", message);
-        model.addAttribute("edit", true);
 
         addMessageSendPart(model);
 
-        return messagesService.availableEdit(message, currentUser) ? "messageDetail" : "redirect:/messages/" + id;
+        return messagesService.availableEdit(message, currentUser)
+                ? "messageDetail" : "redirect:/messages/" + id;
+    }
+
+    @GetMapping("messages/{id}/like")
+    public String like(@AuthenticationPrincipal User user,
+                       @PathVariable Long id,
+                       RedirectAttributes redirectAttributes,
+                       @RequestHeader(required = false) String referer) {
+        messagesService.like(user, id);
+
+        UriComponents componentsBuilder = UriComponentsBuilder.fromHttpUrl(referer).build();
+
+        componentsBuilder.getQueryParams().entrySet()
+                .forEach(pair -> redirectAttributes.addAttribute(pair.getKey(), pair.getValue()));
+
+        return "redirect:" + componentsBuilder.getPath();
     }
 
 }

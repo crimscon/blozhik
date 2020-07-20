@@ -7,8 +7,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Calendar;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "usr_profiles")
@@ -22,11 +21,10 @@ public class UserProfile implements Serializable {
 
     @Enumerated(EnumType.STRING)
     @Column(length = 10)
-    private Sex gender;
+    private Sex gender = Sex.Male;
 
-    @Temporal(TemporalType.DATE)
     @Column(name = "dob")
-    private Date dateOfBirth = Calendar.getInstance().getTime();
+    private LocalDateTime dateOfBirth = LocalDateTime.now();
 
     @Column(name = "phone_number")
     private String phoneNumber = "";
@@ -35,11 +33,10 @@ public class UserProfile implements Serializable {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    public UserProfile(Sex sex, Date dateOfBirth, String phoneNumber) {
+    public UserProfile(Sex sex, LocalDateTime dateOfBirth, String phoneNumber) {
         this.gender = sex;
         this.dateOfBirth = dateOfBirth;
         this.phoneNumber = phoneNumber;
-
     }
 
 }

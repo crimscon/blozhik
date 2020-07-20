@@ -50,8 +50,8 @@ public class ThumbnailUtil {
     }
 
     public static void deleteIfExistFile(String uploadPath, String filename) throws IOException {
+        Files.deleteIfExists(Paths.get(uploadPath + "/thumbs/" + filename));
         Files.deleteIfExists(Paths.get(uploadPath + "/" + filename));
-        Files.deleteIfExists(Paths.get(uploadPath + "/thumb/" + filename));
     }
 
 }

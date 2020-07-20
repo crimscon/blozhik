@@ -5,13 +5,8 @@
                 <img src="/img/${profile.getProfile_pic()}" id="imageResource"
                      class="rounded profilePic" alt="${profile.getUsername()}">
             <#else>
-                <svg class="bd-placeholder-img img-fluid rounded-circle" width="150" height="150"
-                     xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"
-                     focusable="false"
-                     role="img"><title></title>
-                    <rect width="100%" height="100%" fill="#868e96"></rect>
-                    <text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text>
-                </svg>
+                <img src="/static/img/avatar.svg" id="imageResource"
+                     class="rounded profilePic" alt="${profile.getUsername()}">
             </#if>
             <#if isCurrentUser>
                 <a href="edit" class="btn alert-dark border-light btn-block mt-2 mb-2 <#if url == "/edit">active</#if>">

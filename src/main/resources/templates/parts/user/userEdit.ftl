@@ -4,14 +4,14 @@
           enctype="multipart/form-data" class="mt-3">
         <div class="form-row">
             <div class="form-group col-md-6">
+                <label for="E-mail">E-mail</label>
+                <input type="email" class="form-control" id="E-mail" name="email"
+                       <#if profile.getEmail()??>value="${profile.getEmail()}</#if>">
+            </div>
+            <div class="form-group col-md-6">
                 <label for="password">Password</label>
                 <input type="password" class="form-control" id="password" name="password"
                        value="${profile.getPassword()}">
-            </div>
-            <div class="form-group col-md-6">
-                <label for="E-mail">E-mail</label>
-                <input type="email" class="form-control" id="E-mail" name="email"
-                       value="">
             </div>
         </div>
         <div class="form-row">
@@ -27,16 +27,25 @@
                 <label for="dob">Date of birth</label>
 
                 <input type="date" class="form-control" id="dob" name="dateOfBirth"
-                        <#if profile.getUserProfile()?? && profile.getUserProfile().getDateOfBirth()??>
-                            value="${profile.getUserProfile().getDateOfBirth()?date?iso_m("GMT+03")}"
+                        <#if profile.getUserProfile()?? && convertedDate??>
+                    value="${convertedDate?date?iso_m("GMT+03")}"
                         </#if>>
 
             </div>
             <#-- TODO доделать пол!! -->
-            <#--                    <div class="custom-control custom-switch">-->
-            <#--                        <input type="checkbox" class="custom-control-input" id="customSwitch1">-->
-            <#--                        <label class="custom-control-label" for="customSwitch1">Toggle this switch element</label>-->
-            <#--                    </div>-->
+            <div class="form-group col-md-4">
+                <label for="gender">Gender</label>
+                <select class="custom-select" id="gender" name="gender">
+                    <#list genders as gender>
+                        <option
+                                <#if profile.getUserProfile()?? && profile.getUserProfile().getGender()??>
+                                    <#if profile.getUserProfile().getGender() == gender>
+                                        selected
+                                    </#if>
+                                </#if> value="${gender}">${gender}</option>
+                    </#list>
+                </select>
+            </div>
         </div>
         <div class="input-group mb-3">
             <div class="custom-file">
