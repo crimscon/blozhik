@@ -92,7 +92,7 @@ public class UserService implements UserDetailsService {
                 profileChange = false,
                 genderChange = false;
 
-        if (!user.getEmail().equals(email) && !email.isEmpty()) {
+        if (user.getEmail() == null || !user.getEmail().equals(email) && !email.isEmpty()) {
             emailChange = true;
             user.setEmail(email);
         }

@@ -62,12 +62,28 @@ public class UserController {
         Page<MessageDto> page = messagesService.messageListForUser(pageable, user, currentUser);
 
         model.addAttribute("profile", user);
-        if (user.getUserProfile() != null && user.getUserProfile().getDateOfBirth() != null)
-            model.addAttribute("convertedDate",
-                    messagesService.convertDate(user.getUserProfile().getDateOfBirth()));
         model.addAttribute("page", page);
         model.addAttribute("isCurrentUser", currentUser.equals(user));
         model.addAttribute("url", "/messages");
+
+        MessagesController.addMessageSendPart(model);
+
+        return "user/userMessages";
+    }
+
+    @GetMapping("{username}/liked")
+    public String getLikedMessages(@AuthenticationPrincipal User currentUser,
+                                  @PathVariable String username,
+                                  @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable,
+                                  Model model) {
+        User user = (User) userService.loadUserByUsername(username);
+
+        Page<MessageDto> page = messagesService.findWhereMeLiked(pageable, user);
+
+        model.addAttribute("profile", user);
+        model.addAttribute("page", page);
+        model.addAttribute("isCurrentUser", currentUser.equals(user));
+        model.addAttribute("url", "/liked");
 
         MessagesController.addMessageSendPart(model);
 

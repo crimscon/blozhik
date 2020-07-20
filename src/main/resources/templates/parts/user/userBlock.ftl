@@ -1,4 +1,4 @@
-<div class="mt-3 col-sm-12 col-md-12 col-lg-4 pr-1">
+<div class="mt-3 d-none d-lg-block col-lg-4 pr-1">
     <div class="text-center">
         <figure class="figure figure-img img-thumbnail p-2" style="width: 100%">
             <#if profile.getProfile_pic()??>
@@ -8,13 +8,43 @@
                 <img src="/static/img/avatar.svg" id="imageResource"
                      class="rounded profilePic" alt="${profile.getUsername()}">
             </#if>
-            <#if isCurrentUser>
-                <a href="edit" class="btn alert-dark border-light btn-block mt-2 mb-2 <#if url == "/edit">active</#if>">
-                    Редактировать</a>
-            </#if>
         </figure>
-    </div>
-    <div class="list-group">
 
+        <#if isCurrentUser>
+            <div class="card <#if url == "/edit">bg-dark</#if>">
+                <div class="row justify-content-between">
+                    <div class="col-12 p-3">
+                        <a class="text-decoration-none stretched-link <#if url == "/edit">text-light<#else>text-dark</#if>"
+                           href="edit">
+                            <i class="fas fa-user-edit"></i> Редактировать
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card <#if url == "/liked">bg-dark</#if> mt-2">
+                <div class="row justify-content-between">
+                    <div class="col-12 p-3">
+                        <a class="text-decoration-none stretched-link <#if url == "/liked">text-light<#else>text-dark</#if>"
+                           href="liked">
+                            <i class="fas fa-heart text-danger"></i> Понравившееся
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <form action="/logout" method="post">
+                <button class="p-0 btn btn-link btn-block text-dark text-decoration-none" type="submit">
+                    <div class="card mt-2">
+                        <div class="row justify-content-between">
+                            <div class="col-12 p-3">
+                                <input name="_csrf" value="${_csrf.token}" hidden>
+                                <i class="fas fa-sign-out-alt"></i> Выйти
+                            </div>
+                        </div>
+                    </div>
+                </button>
+            </form>
+        </#if>
     </div>
 </div>

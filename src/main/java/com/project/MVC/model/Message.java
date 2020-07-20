@@ -66,7 +66,7 @@ public class Message {
 
     }
 
-    private String createAnnounce(String text) {
+    public static String createAnnounce(String text) {
         String[] textArray = text.split(" ");
         if (textArray.length == 1 || text.length() <= 300) return text.substring(0, Math.min(text.length(), 300));
 

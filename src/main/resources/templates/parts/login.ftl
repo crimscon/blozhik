@@ -106,16 +106,26 @@
 
 <#macro logout>
     <#if user??>
-        <form action="/logout" method="post" class="form-inline">
-            <a href="../../${user.getUsername()}/profile" class="btn btn-link text-light pr-1 mr-2 text-decoration-none">${name}
-            <#if user.getProfile_pic()??>
-                <img src="/img/thumbs/${user.getProfile_pic()}" class="rounded-circle mx-2">
-            </#if>
-            </a>
-            <input type="hidden" name="_csrf" value="${_csrf.token}"/>
-            <button class="btn btn-outline-light my-2 my-sm-0" type="submit"><i class="fas fa-sign-out-alt"></i>
-            </button>
-        </form>
+        <#if user.getProfile_pic()??>
+            <a href="../../${user.getUsername()}/profile"><img src="/img/thumbs/${user.getProfile_pic()}"
+                                                               class="d-none d-lg-block align-self-center img-fluid rounded-circle mr-2"
+                                                               alt="..."></a>
+        <#else>
+            <a href="../../${user.getUsername()}/profile" class=""><img src="/static/img/avatar.svg" id="imageResource"
+                                                                        class="d-none d-lg-block border-none rounded-circle mr-2"
+                                                                        style="background-color: #cacaca!important"
+                                                                        height="40px"
+                                                                        width="40px"></a>
+        </#if>
+        <div class="btn-group d-md d-lg-none" role="group" aria-label="Buttons profile and logout">
+            <form action="/logout" method="post">
+            <a href="../../${user.getUsername()}/profile" class="btn btn-outline-light">${name}</a>
+                <button class="btn btn-outline-light ml-2" type="submit">
+                    <input name="_csrf" value="${_csrf.token}" hidden>
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </form>
+        </div>
     <#else>
         <a href="../../login" class="btn btn-outline-light my-2 my-sm-0">Войти <i class="fas fa-sign-in-alt"></i></a>
     </#if>

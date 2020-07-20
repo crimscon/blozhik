@@ -51,6 +51,9 @@ public class MessagesService {
         } else ThumbnailUtil.deleteIfExistFile(uploadPath, message.getFilename());
     }
 
+    public Page<MessageDto> findWhereMeLiked(Pageable pageable, User user) {
+        return messagesRepository.findWhereMeLiked(pageable, user);
+    }
 
     public MessageDto findById(User user, Long id) {
         return messagesRepository.findById(id, user);
@@ -82,18 +85,34 @@ public class MessagesService {
                 || currentUser.getRoles().contains(Role.ADMIN);
     }
 
-    public void editMessage(User user, Long id, String title, String text) {
+    public void editMessage(User user, Long id, String title, String text, Color color) {
         Message message = messagesRepository.getOne(id);
 
-        if (!message.getText().equals(text)) {
+        boolean changeText = false,
+                changeTitle = false,
+                changeColor = false;
+
+        text = text.replaceAll("\n", "<br/>");
+
+        if (!text.isEmpty() && !message.getText().equals(text)) {
+
             message.setText(text);
+            message.setAnnounce(Message.createAnnounce(text));
+            changeText = true;
         }
 
-        if (!message.getTitle().equals(title)) {
+        if (!title.isEmpty() && !message.getTitle().equals(title)) {
             message.setTitle(title);
+            changeTitle = true;
         }
 
-        messagesRepository.save(message);
+        if (!message.getColor().equals(color)) {
+            message.setColor(color);
+            changeColor = true;
+        }
+
+        if (changeColor || changeText || changeTitle)
+            messagesRepository.save(message);
     }
 
     public Page<MessageDto> messageListForUser(Pageable pageable, User author, User currentUser) {

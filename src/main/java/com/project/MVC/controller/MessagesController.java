@@ -64,8 +64,9 @@ public class MessagesController {
     public String editMessage(@AuthenticationPrincipal User user,
                               @PathVariable Long id,
                               @RequestParam String title,
-                              @RequestParam String text) {
-        messagesService.editMessage(user, id, title, text);
+                              @RequestParam String text,
+                              @RequestParam Color color) {
+        messagesService.editMessage(user, id, title, text, color);
 
         return "redirect:/messages/" + id;
     }
