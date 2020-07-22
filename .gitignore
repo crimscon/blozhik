@@ -3,7 +3,6 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**
 !**/src/test/**
-src/main/resources/static/images/
 
 ### STS ###
 .apt_generated
@@ -31,3 +30,4 @@ build/
 ### VS Code ###
 .vscode/
 
+/src/main/resources/images/
