@@ -23,6 +23,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.Map;
 
 @Controller
@@ -65,15 +66,25 @@ public class MessagesController {
                              @AuthenticationPrincipal User user,
                              Model model) throws IOException {
         boolean hasErrors = message.getText().isEmpty() && (file == null || file.isEmpty());
+        boolean fileTooBig = ((file == null || file.isEmpty()) || ((file.getSize() / 1024) > 5000));
 
-        if (bindingResult.hasErrors() || hasErrors) {
+        if (bindingResult.hasErrors() || hasErrors || fileTooBig) {
 
             Map<String, String> errors = ControllerUtil.getErrors(bindingResult);
 
             if (hasErrors && message.getTitle().isEmpty())
                 errors.put("fillError", "Необходимо заполнить хотя бы одно поле");
-            else if (hasErrors && !message.getTitle().isEmpty()) {
-                errors.put("filenameError", "Нельзя отправить сообщение только с заголовком");
+            else if (hasErrors && !message.getTitle().isEmpty())
+                errors.put("titleError", "Нельзя отправить сообщение только с заголовком");
+            else if (fileTooBig) {
+                double fileWeight = (double) file.getSize() / 1024;
+                int degree = 1;
+                while (fileWeight > 500) {
+                    fileWeight /= 1024;
+                    degree++;
+                }
+                errors.put("filenameError", "Нельзя добавлять файлы более 5Мб. " +
+                        "Ваш файл весит " + new DecimalFormat("#0.0").format(fileWeight) + ((degree == 2) ? "Мб" : "Гб"));
             }
 
             errors.put("url", "add");
