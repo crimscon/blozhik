@@ -31,13 +31,15 @@ public class MessagesService {
         this.messagesRepository = messagesRepository;
     }
 
-    public void createMessage(String title,
-                              String text,
+    public void createMessage(Message message,
                               MultipartFile file,
                               User user,
                               Color color) throws IOException {
 
-        Message message = new Message(title, text, user, color);
+        message.setAuthor(user);
+        message.setColor(color);
+        message.setAnnounce(Message.createAnnounce(message.getText()));
+        message.setDate(LocalDateTime.now());
 
         if (file != null && !file.getOriginalFilename().isEmpty()) {
             String filename = ThumbnailUtil.createFile(file, uploadPath, true);

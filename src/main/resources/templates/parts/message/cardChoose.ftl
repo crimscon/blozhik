@@ -56,7 +56,7 @@
         <h5 class="card-header alert-${message.color?lower_case}">${message.getTitle()}</h5>
         <div class="card-body">
             <#if convertedDateMessage??>
-                <p class="card-text">${message.getText()}</p>
+                <p class="card-text">${currentMessage.getText()}</p>
                 <p class="card-text"><small class="text-muted">Опубликовано ${convertedDateMessage?date}</small></p>
             <#else>
                 <p class="card-text">${message.getAnnounce()}</p>

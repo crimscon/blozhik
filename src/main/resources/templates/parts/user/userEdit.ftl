@@ -11,7 +11,7 @@
             <div class="form-group col-md-6">
                 <label for="password">Password</label>
                 <input type="password" class="form-control" id="password" name="password"
-                       value="${profile.getPassword()}">
+                       value="${profile.getPassword()?substring(0, 8)}">
             </div>
         </div>
         <div class="form-row">

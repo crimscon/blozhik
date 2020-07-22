@@ -3,8 +3,9 @@ function GetButtons() {
     return {
 
         buttonSelf: $(`#dropdownMenuButton`),
-        buttonFile: $(`.custom-file`).find("label:first"),
-        buttonSubmit: $(`.custom-file`).next(),
+        buttonFile: $(`.buttonFile`).find("button:first"),
+        fileLabel: $(`#send`),
+        buttonSubmit: $(`#submit`),
 
         modal: $(`#Message`),
         header: $(`.modal-header`),
@@ -21,6 +22,7 @@ function _changeColorMake(color) {
 
         this.buttonSelf = "btn-outline-" + this._;
         this.buttonFile = this.buttonSelf;
+        this.fileLabel = "border-" + this._;
         this.buttonSubmit = this.buttonSelf;
 
         this.modal = "border-" + this._;

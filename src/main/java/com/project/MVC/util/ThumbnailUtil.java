@@ -41,7 +41,10 @@ public class ThumbnailUtil {
 
         if (!uploadDir.exists()) uploadDir.mkdir();
 
-        String filename = UUID.randomUUID().toString() + "." + file.getOriginalFilename();
+        String fileFormat = file.getOriginalFilename().split("[.]")
+                [file.getOriginalFilename().split("[.]").length - 1];
+
+        String filename = UUID.randomUUID().toString() + "." + fileFormat;
 
         file.transferTo(new File(uploadPath + "/" + filename));
         ThumbnailUtil.createThumbnail(filename, uploadPath, isMessage);
