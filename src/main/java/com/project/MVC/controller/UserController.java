@@ -14,10 +14,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -25,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
+@SessionAttributes(names = "errors")
 public class UserController {
 
     private final UserService userService;
@@ -38,6 +37,7 @@ public class UserController {
     @GetMapping("{username}/profile")
     public String getProfile(@AuthenticationPrincipal User currentUser,
                              @PathVariable String username,
+                             SessionStatus status,
                              Model model) {
         User user = (User) userService.loadUserByUsername(username);
         model.addAttribute("profile", user);
@@ -49,12 +49,15 @@ public class UserController {
 
         MessagesController.addMessageSendPart(model);
 
+        status.setComplete();
+
         return "user/userProfile";
     }
 
     @GetMapping("{username}/messages")
     public String getUserMessages(@AuthenticationPrincipal User currentUser,
                                   @PathVariable String username,
+                                  SessionStatus status,
                                   @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable,
                                   Model model) {
         User user = (User) userService.loadUserByUsername(username);
@@ -68,12 +71,15 @@ public class UserController {
 
         MessagesController.addMessageSendPart(model);
 
+        status.setComplete();
+
         return "user/userMessages";
     }
 
     @GetMapping("{username}/liked")
     public String getLikedMessages(@AuthenticationPrincipal User currentUser,
                                   @PathVariable String username,
+                                   SessionStatus status,
                                   @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable,
                                   Model model) {
         User user = (User) userService.loadUserByUsername(username);
@@ -86,6 +92,8 @@ public class UserController {
         model.addAttribute("url", "/liked");
 
         MessagesController.addMessageSendPart(model);
+
+        status.setComplete();
 
         return "user/userMessages";
     }

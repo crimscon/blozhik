@@ -76,3 +76,10 @@ input[type="radio"] + label span, input[type="radio"]:checked + label span {
     height: 100%;
     margin: 0 auto;
 }
+
+#send:after {
+    content: none!important;
+}
+#send {
+    border: none;
+}

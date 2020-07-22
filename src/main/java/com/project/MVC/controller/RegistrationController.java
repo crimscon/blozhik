@@ -1,16 +1,16 @@
 package com.project.MVC.controller;
 
 import com.project.MVC.model.User;
-import com.project.MVC.model.enums.Role;
 import com.project.MVC.service.UserService;
+import com.project.MVC.util.ControllerUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.HashSet;
-import java.util.Set;
+import javax.validation.Valid;
+import java.util.Map;
 
 @Controller
 public class RegistrationController {
@@ -26,44 +26,30 @@ public class RegistrationController {
     }
 
     @PostMapping("/registration")
-    public String addUser(@RequestParam(defaultValue = "") String password,
-                          @RequestParam(defaultValue = "") String password2,
-                          @RequestParam(defaultValue = "") String email,
-                          User user, Model model) {
-        if (!password.equals(password2)) {
-            model.addAttribute("message", "Пароли не одинаковые!");
-            model.addAttribute("username", user != null ? user.getUsername() : "");
-            model.addAttribute("password", password);
-            model.addAttribute("password2", password2);
-            model.addAttribute("email", email);
-            return "registration";
-        }
+    public String addUser(@Valid User user, BindingResult bindingResult, Model model) {
 
-        User userFromDb = (User) userService.loadUserByUsername(user.getUsername());
+        boolean hasError = user.getPassword() != null && !user.getPassword().equals(user.getPasswordConfirm());
 
-        if (userFromDb != null) {
-            model.addAttribute("message", "Пользователь уже существует!");
+        if (bindingResult.hasErrors() || hasError) {
+            Map<String, String> errors = ControllerUtil.getErrors(bindingResult);
+
+            if (hasError)
+                errors.put("passwordError", "Пароли не одинаковые");
+
+            User userFromDb = (User) userService.loadUserByUsername(user.getUsername());
+
+            if (userFromDb != null) errors.put("usernameError", "Такой пользователь уже существует");
+
+            model.addAttribute("errors", errors);
             model.addAttribute("user", user);
-            model.addAttribute("password", password);
-            model.addAttribute("password2", password2);
-            model.addAttribute("email", email);
+
             return "registration";
+        } else {
+            userService.addUser(user);
+
+            return "redirect:/login";
         }
 
-        user.setActive(true);
-
-        Set<Role> roleSet = new HashSet<>();
-
-        if (userService.findAll().isEmpty()) {
-            roleSet.add(Role.ADMIN);
-        }
-
-        roleSet.add(Role.USER);
-        user.setRoles(roleSet);
-
-        userService.save(user);
-
-        return "redirect:/login";
     }
 
 }

@@ -20,6 +20,14 @@
             <h1 class="h3 mb-3 font-weight-normal">Бложик</h1>
         </div>
 
+        <#if Session?? && Session.SPRING_SECURITY_LAST_EXCEPTION??>
+
+            <div class="alert alert-danger mt-2">
+                ${Session.SPRING_SECURITY_LAST_EXCEPTION.message}
+            </div>
+
+        </#if>
+
         <div class="form-label-group">
             <input type="text" id="username" name="username" class="form-control" placeholder="Login"
                    required="required"
@@ -61,38 +69,54 @@
         <div class="text-center mb-4">
             <h1 class="h3 mb-3 font-weight-normal">Бложик</h1>
         </div>
-
-        <#if message??>
-            <div class="alert alert-danger" role="alert">
-                ${message}
-            </div>
-        </#if>
-        <div class="form-label-group">
-            <input type="text" id="username" name="username" class="form-control" placeholder="Login"
-                   required="required"
-                   autofocus="autofocus" autocomplete="off">
-            <label for="username"></label>
+        <div class="form-label-group mb-3">
+            <input type="text" id="username" name="username"
+                   class="form-control ${(errors?? && errors.usernameError??)?string('is-invalid', '')}"
+                   placeholder="Login"
+                   autofocus="autofocus" autocomplete="off"
+                   value="<#if user??>${user.getUsername()}</#if>">
+            <#if errors?? && errors.usernameError??>
+                <div class="invalid-feedback">
+                    ${errors.usernameError}
+                </div>
+            </#if>
         </div>
 
-        <div class="form-label-group">
-            <input type="email" id="email" name="email" class="form-control" placeholder="E-mail"
-                   required="required"
-                   autocomplete="off">
-            <label for="email"></label>
+        <div class="form-label-group mb-3">
+            <input type="email" id="email" name="email"
+                   class="form-control ${(errors?? && errors.emailError??)?string('is-invalid', '')}"
+                   placeholder="E-mail"
+                   autocomplete="off"
+                   value="<#if user??>${user.getEmail()}</#if>">
+            <#if errors?? && errors.emailError??>
+                <div class="invalid-feedback">
+                    ${errors.emailError}
+                </div>
+            </#if>
         </div>
 
-        <div class="form-label-group">
-            <input type="password" id="inputPassword" name="password" class="form-control" placeholder="Password"
-                   required="required"
+        <div class="form-label-group mb-3">
+            <input type="password" id="inputPassword" name="password"
+                   class="form-control ${(errors?? && errors.passwordError??)?string('is-invalid', '')}"
+                   placeholder="Password"
                    autocomplete="off">
-            <label for="inputPassword"></label>
+            <#if errors?? && errors.passwordError??>
+                <div class="invalid-feedback">
+                    ${errors.passwordError}
+                </div>
+            </#if>
         </div>
 
-        <div class="form-label-group">
-            <input type="password" id="inputPassword2" name="password2" class="form-control"
-                   placeholder="Repeat password" required="required"
+        <div class="form-label-group mb-3">
+            <input type="password" id="inputPasswordConfirm" name="passwordConfirm"
+                   class="form-control ${(errors?? && errors.passwordError??)?string('is-invalid', '')}"
+                   placeholder="Repeat password"
                    autocomplete="off">
-            <label for="inputPassword2"></label>
+            <#if errors?? && errors.passwordError??>
+                <div class="invalid-feedback">
+                    ${errors.passwordError}
+                </div>
+            </#if>
         </div>
 
         <input type="hidden" name="_csrf" value="${_csrf.token}"/>
@@ -119,7 +143,7 @@
         </#if>
         <div class="btn-group d-md d-lg-none" role="group" aria-label="Buttons profile and logout">
             <form action="/logout" method="post">
-            <a href="../../${user.getUsername()}/profile" class="btn btn-outline-light">${name}</a>
+                <a href="../../${user.getUsername()}/profile" class="btn btn-outline-light">${name}</a>
                 <button class="btn btn-outline-light ml-2" type="submit">
                     <input name="_csrf" value="${_csrf.token}" hidden>
                     <i class="fas fa-sign-out-alt"></i>
