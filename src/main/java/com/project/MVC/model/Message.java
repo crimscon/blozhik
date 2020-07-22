@@ -1,24 +1,29 @@
 package com.project.MVC.model;
 
 import com.project.MVC.model.enums.Color;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Data
 @NoArgsConstructor
-@EqualsAndHashCode(of = "id")
+@Getter
+@Setter
 public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
+    @Column
+    private Long viewers = 0L;
 
     @Column(columnDefinition = "text", length = 300)
     private String title;
@@ -32,8 +37,8 @@ public class Message {
     @Enumerated(EnumType.STRING)
     private Color color;
 
-    @Temporal(TemporalType.DATE)
-    private Date date;
+    @CreatedDate
+    private LocalDateTime date;
 
     @ManyToMany
     @JoinTable(
@@ -49,8 +54,11 @@ public class Message {
     private String filename;
 
     public Message(String title, String text, User author, Color color) {
-        this.date = new Date();
+        this.date = LocalDateTime.now();
         this.title = title;
+
+        text = text.replaceAll("\n", "<br/>");
+
         this.text = text;
         this.announce = createAnnounce(text);
         this.author = author;
@@ -58,17 +66,31 @@ public class Message {
 
     }
 
-    private String createAnnounce(String text) {
+    public static String createAnnounce(String text) {
         String[] textArray = text.split(" ");
-        if (textArray.length == 1) return text.substring(0, Math.min(text.length(), 300));
+        if (textArray.length == 1 || text.length() <= 300) return text.substring(0, Math.min(text.length(), 300));
 
         StringBuilder stringBuilder = new StringBuilder();
 
-        Arrays.stream(textArray).filter(s -> (stringBuilder.length() + s.length() + 3) <= 300).forEach(s -> stringBuilder.append(s).append(" "));
+        Arrays.stream(textArray).filter(s -> (stringBuilder.length() + s.length() + 3) <= 300)
+                .forEach(s -> stringBuilder.append(s).append(" "));
 
         stringBuilder.trimToSize();
         stringBuilder.append("...");
 
         return stringBuilder.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Message message = (Message) o;
+        return id.equals(message.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

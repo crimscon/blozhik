@@ -41,6 +41,9 @@ public class UserController {
                              Model model) {
         User user = (User) userService.loadUserByUsername(username);
         model.addAttribute("profile", user);
+        if (user.getUserProfile() != null && user.getUserProfile().getDateOfBirth() != null)
+            model.addAttribute("convertedDate",
+                    messagesService.convertDate(user.getUserProfile().getDateOfBirth()));
         model.addAttribute("isCurrentUser", currentUser.equals(user));
         model.addAttribute("url", "/profile");
 
@@ -68,6 +71,25 @@ public class UserController {
         return "user/userMessages";
     }
 
+    @GetMapping("{username}/liked")
+    public String getLikedMessages(@AuthenticationPrincipal User currentUser,
+                                  @PathVariable String username,
+                                  @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable,
+                                  Model model) {
+        User user = (User) userService.loadUserByUsername(username);
+
+        Page<MessageDto> page = messagesService.findWhereMeLiked(pageable, user);
+
+        model.addAttribute("profile", user);
+        model.addAttribute("page", page);
+        model.addAttribute("isCurrentUser", currentUser.equals(user));
+        model.addAttribute("url", "/liked");
+
+        MessagesController.addMessageSendPart(model);
+
+        return "user/userMessages";
+    }
+
     @GetMapping("{username}/edit")
     public String getEditForm(@AuthenticationPrincipal User currentUser,
                               @PathVariable String username,
@@ -76,12 +98,16 @@ public class UserController {
 
         if (currentUser.equals(user)) {
             model.addAttribute("profile", currentUser);
+
+            if (currentUser.getUserProfile() != null && currentUser.getUserProfile().getDateOfBirth() != null)
+                model.addAttribute("convertedDate",
+                        messagesService.convertDate(currentUser.getUserProfile().getDateOfBirth()));
             model.addAttribute("url", "/edit");
+            model.addAttribute("genders", Sex.values());
             model.addAttribute("isCurrentUser", currentUser.equals(user));
 
             return "user/userEdit";
-        }
-        else return "redirect:/{username}/profile";
+        } else return "redirect:/{username}/profile";
     }
 
     @PostMapping("{username}/edit")
@@ -89,9 +115,10 @@ public class UserController {
                                @RequestParam(required = false) Sex gender,
                                @RequestParam(required = false) String phoneNumber,
                                @RequestParam(required = false) String dateOfBirth,
+                               @RequestParam String email,
                                @RequestParam("profile_pic") MultipartFile file,
                                @AuthenticationPrincipal User user) throws IOException {
-        userService.saveUser(user, password, file, gender, phoneNumber, dateOfBirth);
+        userService.saveUser(user, email, password, file, gender, phoneNumber, dateOfBirth);
 
         return "redirect:/{username}/profile";
     }

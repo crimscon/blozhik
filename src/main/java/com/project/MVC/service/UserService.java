@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -77,40 +78,52 @@ public class UserService implements UserDetailsService {
         userRepo.save(user);
     }
 
-    public void saveUser(User user, String password,
+    public void saveUser(User user, String email, String password,
                          MultipartFile file,
                          Sex gender, String phoneNumber, String dateOfBirth) throws IOException {
         UserProfile userProfile = user.getUserProfile() == null ?
                 new UserProfile() : userProfileRepo.getOne(user.getUserProfile().getId());
 
         boolean passwordChange = false,
+                emailChange = false,
                 profilePicChange = false,
                 phoneChange = false,
                 dofChange = false,
-                profileChange = false;
+                profileChange = false,
+                genderChange = false;
 
-        if (!user.getPassword().equals(password)) {
+        if (user.getEmail() == null || !user.getEmail().equals(email) && !email.isEmpty()) {
+            emailChange = true;
+            user.setEmail(email);
+        }
+
+        if (!user.getPassword().equals(password) && !password.isEmpty()) {
             passwordChange = true;
             user.setPassword(password);
         }
 
-        if (!dateOfBirth.equals("")) {
-            String[] dateArr = dateOfBirth.split("-");
-            Calendar calendar = Calendar.getInstance();
-            calendar.set(Integer.parseInt(dateArr[0]), Integer.parseInt(dateArr[1]) - 1, Integer.parseInt(dateArr[2]));
+        if (!userProfile.getGender().equals(gender)) {
+            genderChange = true;
+            userProfile.setGender(gender);
+        }
 
-            if (!userProfile.getDateOfBirth().equals(calendar.getTime())) {
+        if (!dateOfBirth.equals("") && !dateOfBirth.isEmpty()) {
+            String[] dateArr = dateOfBirth.split("-");
+
+            LocalDateTime localDate = LocalDateTime.of(Integer.parseInt(dateArr[0]), Integer.parseInt(dateArr[1]), Integer.parseInt(dateArr[2]), 0, 0);
+
+            if (!userProfile.getDateOfBirth().equals(localDate)) {
                 dofChange = true;
-                userProfile.setDateOfBirth(calendar.getTime());
+                userProfile.setDateOfBirth(localDate);
             }
         }
 
-        if (!userProfile.getPhoneNumber().equals(phoneNumber)) {
+        if (!userProfile.getPhoneNumber().equals(phoneNumber) && !phoneNumber.isEmpty()) {
             phoneChange = true;
             userProfile.setPhoneNumber(phoneNumber);
         }
 
-        if (phoneChange || dofChange) {
+        if (phoneChange || dofChange || genderChange) {
             profileChange = true;
             userProfile.setUser(user);
         }
@@ -129,7 +142,7 @@ public class UserService implements UserDetailsService {
             profilePicChange = true;
         }
 
-        if (passwordChange || profilePicChange || profileChange) userRepo.save(user);
+        if (passwordChange || emailChange || profilePicChange || profileChange) userRepo.save(user);
     }
 
 

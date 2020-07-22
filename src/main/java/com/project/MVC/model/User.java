@@ -25,6 +25,7 @@ public class User implements UserDetails {
     private String password;
     private boolean active;
     private String profile_pic;
+    private String email;
 
     @OneToOne(fetch = FetchType.LAZY,
             cascade =  CascadeType.ALL,
@@ -38,6 +39,7 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     Set<Message> messages;
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
