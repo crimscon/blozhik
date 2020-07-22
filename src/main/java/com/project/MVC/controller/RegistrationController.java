@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
 import java.util.Map;
@@ -26,9 +27,12 @@ public class RegistrationController {
     }
 
     @PostMapping("/registration")
-    public String addUser(@Valid User user, BindingResult bindingResult, Model model) {
+    public String addUser(@RequestParam(defaultValue = "") String passwordConfirm,
+                          @Valid User user,
+                          BindingResult bindingResult,
+                          Model model) {
 
-        boolean hasError = user.getPassword() != null && !user.getPassword().equals(user.getPasswordConfirm());
+        boolean hasError = user.getPassword() != null && !user.getPassword().equals(passwordConfirm);
 
         if (bindingResult.hasErrors() || hasError) {
             Map<String, String> errors = ControllerUtil.getErrors(bindingResult);

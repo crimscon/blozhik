@@ -30,9 +30,6 @@ public class User implements UserDetails {
     @NotBlank(message = "Пароль не может быть пустым")
     private String password;
 
-    @Transient
-    private String passwordConfirm;
-
     private boolean active;
     private String profile_pic;
 
