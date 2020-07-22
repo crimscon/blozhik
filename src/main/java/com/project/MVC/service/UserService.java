@@ -8,9 +8,11 @@ import com.project.MVC.repository.UserProfileRepository;
 import com.project.MVC.repository.UserRepository;
 import com.project.MVC.util.ThumbnailUtil;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,20 +24,27 @@ import java.util.stream.Collectors;
 @Service
 public class UserService implements UserDetailsService {
     private final UserRepository userRepo;
-
     private final UserProfileRepository userProfileRepo;
+    private final PasswordEncoder passwordEncoder;
 
     @Value("${upload.path}")
     private String uploadPath;
 
-    public UserService(UserRepository userRepo, UserProfileRepository userProfileRepo) {
+    public UserService(UserRepository userRepo, UserProfileRepository userProfileRepo, @Lazy PasswordEncoder passwordEncoder) {
         this.userRepo = userRepo;
         this.userProfileRepo = userProfileRepo;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepo.findByUsernameIgnoreCase(username);
+        User user = userRepo.findByUsernameIgnoreCase(username);
+
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found");
+        }
+
+        return user;
     }
 
     public User findById(Long aLong) {
@@ -57,11 +66,28 @@ public class UserService implements UserDetailsService {
         return users;
     }
 
+    public void addUser(User user) {
+
+        user.setActive(true);
+
+        Set<Role> roleSet = new HashSet<>();
+
+        if (findAll().isEmpty()) {
+            roleSet.add(Role.ADMIN);
+        }
+
+        roleSet.add(Role.USER);
+        user.setRoles(roleSet);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        save(user);
+    }
+
     public void saveUser(String username, String password,
                          Map<String, String> form, Long userId) {
         User user = findById(userId);
         user.setUsername(username);
-        user.setPassword(password);
+        user.setPassword(passwordEncoder.encode(password));
 
         Set<String> roles = Arrays.stream(Role.values())
                 .map(Role::name)
@@ -99,7 +125,7 @@ public class UserService implements UserDetailsService {
 
         if (!user.getPassword().equals(password) && !password.isEmpty()) {
             passwordChange = true;
-            user.setPassword(password);
+            user.setPassword(passwordEncoder.encode(password));
         }
 
         if (!userProfile.getGender().equals(gender)) {

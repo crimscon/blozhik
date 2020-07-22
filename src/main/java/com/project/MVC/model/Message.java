@@ -4,6 +4,7 @@ import com.project.MVC.model.enums.Color;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.validator.constraints.Length;
 import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
@@ -25,10 +26,11 @@ public class Message {
     @Column
     private Long viewers = 0L;
 
-    @Column(columnDefinition = "text", length = 300)
+    @Length(max = 300, message = "Заголовок не может быть больше 300 символов")
+    @Column(columnDefinition = "text")
     private String title;
 
-    @Column(columnDefinition = "text", length = 300)
+    @Column(columnDefinition = "text")
     private String announce;
 
     @Column(columnDefinition = "text")
