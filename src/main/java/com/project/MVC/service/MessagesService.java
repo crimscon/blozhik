@@ -6,6 +6,7 @@ import com.project.MVC.model.dto.MessageDto;
 import com.project.MVC.model.enums.Color;
 import com.project.MVC.model.enums.Role;
 import com.project.MVC.repository.MessagesRepository;
+import com.project.MVC.util.MessageUtil;
 import com.project.MVC.util.ThumbnailUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -35,10 +36,10 @@ public class MessagesService {
                               MultipartFile file,
                               User user,
                               Color color) throws IOException {
-
+        message.setText(MessageUtil.createText(message.getText()));
         message.setAuthor(user);
         message.setColor(color);
-        message.setAnnounce(Message.createAnnounce(message.getText()));
+        message.setAnnounce(MessageUtil.createAnnounce(message.getText()));
         message.setDate(LocalDateTime.now());
 
         if (file != null && !file.getOriginalFilename().isEmpty()) {
@@ -94,12 +95,12 @@ public class MessagesService {
                 changeTitle = false,
                 changeColor = false;
 
-        text = text.replaceAll("\n", "<br/>");
+        text = MessageUtil.createText(text);
 
         if (!text.isEmpty() && !message.getText().equals(text)) {
 
             message.setText(text);
-            message.setAnnounce(Message.createAnnounce(text));
+            message.setAnnounce(MessageUtil.createAnnounce(text));
             changeText = true;
         }
 

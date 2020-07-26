@@ -2,7 +2,7 @@
     <div class="card border-${message.color?lower_case}">
         <img src="/img/thumbs/${message.filename}" class="card-img-top">
         <h5 class="card-header alert-${message.color?lower_case}">${message.getTitle()}</h5>
-        <div class="card-body">
+        <div class="card-body overflow-hidden">
             <#if convertedDateMessage??>
                 <p class="card-text">${message.getText()}</p>
                 <p class="card-text"><small class="text-muted">Опубликовано ${convertedDateMessage?date}</small></p>
@@ -27,7 +27,7 @@
 <#elseif message.getFilename()?? && message.getText() != "">
     <div class="card border-${message.color?lower_case}">
         <img src="/img/thumbs/${message.filename}" class="card-img-top">
-        <blockquote class="blockquote mb-0 card-body">
+        <blockquote class="blockquote mb-0 card-body overflow-hidden">
             <#if convertedDateMessage??>
                 <p>${message.getText()}</p>
                 <p class="card-text"><small class="text-muted">Опубликовано ${convertedDateMessage?date}</small></p>
@@ -40,7 +40,7 @@
     </div>
 <#elseif message.getText() != "" && message.getTitle() == "">
     <div class="card border-${message.color?lower_case}">
-        <blockquote class="blockquote mb-0 card-body mt-3 mx-4 mb-0">
+        <blockquote class="blockquote mb-0 card-body mt-3 mx-4 mb-0 overflow-hidden">
             <#if convertedDateMessage??>
                 <p>${message.getText()}</p>
                 <p class="card-text"><small class="text-muted">Опубликовано ${convertedDateMessage?date}</small></p>
@@ -54,7 +54,7 @@
 <#elseif message.getTitle() != "" && message.getAnnounce() != "">
     <div class="card border-${message.color?lower_case}">
         <h5 class="card-header alert-${message.color?lower_case}">${message.getTitle()}</h5>
-        <div class="card-body">
+        <div class="card-body overflow-hidden">
             <#if convertedDateMessage??>
                 <p class="card-text">${currentMessage.getText()}</p>
                 <p class="card-text"><small class="text-muted">Опубликовано ${convertedDateMessage?date}</small></p>

@@ -40,7 +40,7 @@ public class RegistrationController {
             if (hasError)
                 errors.put("passwordError", "Пароли не одинаковые");
 
-            User userFromDb = (User) userService.loadUserByUsername(user.getUsername());
+            User userFromDb = userService.getUserByUsername(user.getUsername());
 
             if (userFromDb != null) errors.put("usernameError", "Такой пользователь уже существует");
 

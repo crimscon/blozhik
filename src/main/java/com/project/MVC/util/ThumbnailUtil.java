@@ -13,8 +13,6 @@ import java.nio.file.Paths;
 import java.util.UUID;
 
 public class ThumbnailUtil {
-
-
     public static void createThumbnail(String filename, String uploadPath, boolean isMessage) throws IOException {
 
         File uploadDir = new File(uploadPath);

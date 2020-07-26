@@ -66,7 +66,7 @@ public class MessagesController {
                              @AuthenticationPrincipal User user,
                              Model model) throws IOException {
         boolean hasErrors = message.getText().isEmpty() && (file == null || file.isEmpty());
-        boolean fileTooBig = ((file == null || file.isEmpty()) || ((file.getSize() / 1024) > 5000));
+        boolean fileTooBig = ((file != null || !file.isEmpty()) && ((file.getSize() / 1024) > 5000));
 
         if (bindingResult.hasErrors() || hasErrors || fileTooBig) {
 
@@ -97,8 +97,7 @@ public class MessagesController {
 
         UriComponents componentsBuilder = UriComponentsBuilder.fromHttpUrl(referer).build();
 
-        componentsBuilder.getQueryParams().entrySet()
-                .forEach(pair -> redirectAttributes.addAttribute(pair.getKey(), pair.getValue()));
+        componentsBuilder.getQueryParams().forEach(redirectAttributes::addAttribute);
 
         return "redirect:" + componentsBuilder.getPath();
 
@@ -171,8 +170,7 @@ public class MessagesController {
 
         UriComponents componentsBuilder = UriComponentsBuilder.fromHttpUrl(referer).build();
 
-        componentsBuilder.getQueryParams().entrySet()
-                .forEach(pair -> redirectAttributes.addAttribute(pair.getKey(), pair.getValue()));
+        componentsBuilder.getQueryParams().forEach(redirectAttributes::addAttribute);
 
         return "redirect:" + componentsBuilder.getPath();
     }
