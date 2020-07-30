@@ -128,36 +128,7 @@
                                             ${errors.fillError}
                                         </div>
                                     </#if>
-
-                                    <#--                                    <div class="file-field">-->
-                                    <#--                                        <a href class="float-left btn btn-outline-${colorMessage}">-->
-                                    <#--                                            <i class="fas fa-paperclip" aria-hidden="true"></i>-->
-                                    <#--                                            <input accept=".jpg, .jpeg, .png" name="picture" type="file"-->
-                                    <#--                                                   id="inputFile">-->
-                                    <#--                                            <#if errors?? && errors.filenameError??>-->
-                                    <#--                                                <div class="invalid-feedback">-->
-                                    <#--                                                    ${errors.filenameError}-->
-                                    <#--                                                </div>-->
-                                    <#--                                            <#elseif errors?? && errors.fillError??>-->
-                                    <#--                                                <div class="invalid-feedback">-->
-                                    <#--                                                    ${errors.fillError}-->
-                                    <#--                                                </div>-->
-                                    <#--                                            </#if>-->
-                                    <#--                                        </a>-->
-                                    <#--                                        <div class="file-path-wrapper ">-->
-                                    <#--                                            <input class="file-path validate" type="text">-->
-                                    <#--                                        </div>-->
-                                    <#--                                    </div>-->
                                 </div>
-
-                                <#--                                <div class="custom-file }">-->
-                                <#--                                    <input accept=".jpg, .jpeg, .png" name="picture" type="file" style="display:none"-->
-                                <#--                                           id="inputFile">-->
-
-                                <#--                                    <label for="inputFile" class="m-0 btn btn-outline-${colorMessage}">-->
-                                <#--                                        <i class="fas fa-paperclip"></i>-->
-                                <#--                                    </label>-->
-                                <#--                                </div>-->
                                 <div class="col-3 col-md-2">
                                     <button id="submit" class="p-2 btn btn-outline-${colorMessage}"
                                             style="height: 100%; width: 100%" type="submit"><i

@@ -1,11 +1,12 @@
 function GetButtons() {
 
+    // noinspection JSJQueryEfficiency
     return {
 
-        buttonSelf: $(`#dropdownMenuButton`),
+        buttonSelf: $(`.modal-footer`).find(`#dropdownMenuButton`),
         buttonFile: $(`.buttonFile`).find("button:first"),
-        fileLabel: $(`#send`),
-        buttonSubmit: $(`#submit`),
+        fileLabel: $(`.modal-footer`).find(`#send`),
+        buttonSubmit: $(`.modal-footer`).find(`#submit`),
 
         modal: $(`#Message`),
         header: $(`.modal-header`),
@@ -14,11 +15,22 @@ function GetButtons() {
 
 }
 
+function GetColor() {
+    const buttonSelf = $(`#dropdownMenuButton`);
+
+    const classes = buttonSelf.attr('class');
+    if (classes !== undefined) {
+        classList = classes.split(/\s+/);
+        let classAttributes = classList[classList.length - 1].split('-');
+
+        return classAttributes[classAttributes.length - 1];
+    } else return "primary";
+}
+
 function _changeColorMake(color) {
 
     changeColor.buttons = new function () {
-
-        this._ = color || "primary";
+        this._ = color || GetColor();
 
         this.buttonSelf = "btn-outline-" + this._;
         this.buttonFile = this.buttonSelf;
@@ -102,11 +114,11 @@ window.addEventListener("DOMContentLoaded", function () {
 
 });
 
-$('.custom-file-input').on('change', function() {
+$('#customFile').on('change', function () {
     let fileName = $(this).val().split('\\').pop();
     $(this).next('.custom-file-label').addClass("selected").html(fileName);
 });
 
-$(`.buttonFile`).find("button:first").click(function(){
+$(`.buttonFile`).find("button:first").click(function () {
     $('#send').click();
 });

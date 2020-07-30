@@ -166,9 +166,9 @@ public class UserController {
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
-    @PostMapping("/users/delete")
-    public String deleteUser(@RequestParam(name = "userId") User user) throws IOException {
-        userService.deleteUser(user);
+    @PostMapping("/users/{id}/delete")
+    public String deleteUser(@PathVariable Long id) throws IOException {
+        userService.deleteUser(userService.findById(id));
 
         return "redirect:/users";
     }

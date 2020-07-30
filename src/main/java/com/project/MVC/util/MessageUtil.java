@@ -2,7 +2,7 @@ package com.project.MVC.util;
 
 import java.util.Arrays;
 
-public class MessageUtil {
+public abstract class MessageUtil {
     public static String createText(String text) {
         text = text.replaceAll("<", "&lt;");
         text = text.replaceAll(">", "&gt;");
