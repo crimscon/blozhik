@@ -1,6 +1,7 @@
 package com.project.MVC.model;
 
 import com.project.MVC.model.enums.Color;
+import com.project.MVC.util.MessageUtil;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,8 +9,8 @@ import org.hibernate.validator.constraints.Length;
 import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -18,7 +19,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Message {
+public class Message implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -58,29 +59,10 @@ public class Message {
     public Message(String title, String text, User author, Color color) {
         this.date = LocalDateTime.now();
         this.title = title;
-
-        text = text.replaceAll("\n", "<br/>");
-
-        this.text = text;
-        this.announce = createAnnounce(text);
+        this.text = MessageUtil.createText(text);
+        this.announce = MessageUtil.createAnnounce(this.getText());
         this.author = author;
         this.color = color;
-
-    }
-
-    public static String createAnnounce(String text) {
-        String[] textArray = text.split(" ");
-        if (textArray.length == 1 || text.length() <= 300) return text.substring(0, Math.min(text.length(), 300));
-
-        StringBuilder stringBuilder = new StringBuilder();
-
-        Arrays.stream(textArray).filter(s -> (stringBuilder.length() + s.length() + 3) <= 300)
-                .forEach(s -> stringBuilder.append(s).append(" "));
-
-        stringBuilder.trimToSize();
-        stringBuilder.append("...");
-
-        return stringBuilder.toString();
     }
 
     @Override

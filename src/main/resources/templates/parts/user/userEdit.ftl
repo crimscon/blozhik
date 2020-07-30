@@ -2,7 +2,7 @@
     <form method="post"
           action="/${profile.getUsername()}/edit?${_csrf.parameterName}=${_csrf.token}"
           enctype="multipart/form-data" class="mt-3">
-        <div class="form-row">
+        <div class="form-row userInfo">
             <div class="form-group col-md-6">
                 <label for="E-mail">E-mail</label>
                 <input type="email" class="form-control" id="E-mail" name="email"
@@ -14,7 +14,7 @@
                        value="${profile.getPassword()?substring(0, 8)}">
             </div>
         </div>
-        <div class="form-row">
+        <div class="form-row userProfile">
             <div class="form-group col-md-4">
                 <label for="phoneNumber">Phone</label>
                 <input type="tel" name="phoneNumber" class="form-control tel"
@@ -32,7 +32,6 @@
                         </#if>>
 
             </div>
-            <#-- TODO доделать пол!! -->
             <div class="form-group col-md-4">
                 <label for="gender">Gender</label>
                 <select class="custom-select" id="gender" name="gender">
@@ -47,7 +46,7 @@
                 </select>
             </div>
         </div>
-        <div class="input-group mb-3">
+        <div class="input-group mb-3 userPic">
             <div class="custom-file">
                 <input accept=".jpg, .jpeg, .png" name="profile_pic" type="file"
                        class="custom-file-input" id="customFile">

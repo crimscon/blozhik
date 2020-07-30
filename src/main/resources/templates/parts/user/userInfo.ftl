@@ -2,21 +2,21 @@
     <div class="row p-3">
         <div class="col-lg-12">
             <h4 class="align-middle text-center text-muted display-4">
-            <#if profile.getProfile_pic()??>
-                <img src="/img/${profile.getProfile_pic()}" id="imageResource"
-                     class="d-md d-lg-none rounded-circle" alt="${profile.getUsername()}" width="60px"
-                     height="60px">
-                <a href="edit" class="stretched-link"></a>
-            <#else>
-                <img src="/static/img/avatar.svg" id="imageResource"
-                     class="d-md d-lg-none rounded-circle" height="60px" width="60px"
-                     alt="${profile.getUsername()}">
-                <a href="edit" class="stretched-link"></a>
-            </#if>
-            ${profile.getUsername()}</h4>
+                <#if profile.getProfile_pic()??>
+                    <img src="/img/${profile.getProfile_pic()}" id="imageResource"
+                         class="d-md d-lg-none rounded-circle" alt="${profile.getUsername()}" width="60px"
+                         height="60px">
+                <#else>
+                    <img src="/static/img/avatar.svg" id="imageResource"
+                         class="d-md d-lg-none rounded-circle" height="60px" width="60px"
+                         alt="${profile.getUsername()}">
+                </#if>
+                ${profile.getUsername()} </h4>
+            <i class="far fa-edit d-md d-lg-none"
+               style="font-size: 1.3rem; color: lightslategray; position: absolute; bottom: 0; right: 10px"></i>
         </div>
-
     </div>
+    <a href="edit" class="stretched-link"></a>
 </div>
 <div class="card mt-3">
     <#if profile.getUserProfile()??>

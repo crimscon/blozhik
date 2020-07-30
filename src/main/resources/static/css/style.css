@@ -82,4 +82,12 @@ input[type="radio"] + label span, input[type="radio"]:checked + label span {
 }
 #send {
     border: none;
+    border-radius: 0;
+}
+.userProfile:before, .userPic:before {
+    content: '';
+    height: 1px;
+    width: 100%;
+    background: lightgray;
+    margin: 1rem 0;
 }
