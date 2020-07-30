@@ -106,3 +106,7 @@ $('.custom-file-input').on('change', function() {
     let fileName = $(this).val().split('\\').pop();
     $(this).next('.custom-file-label').addClass("selected").html(fileName);
 });
+
+$(`.buttonFile`).find("button:first").click(function(){
+    $('#send').click();
+});
