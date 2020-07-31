@@ -133,6 +133,7 @@ public class MessagesController {
         model.addAttribute("convertedDateMessage", messagesService.convertDate(message.getDate()));
         model.addAttribute("author", userService.findById(message.getAuthor().getId()));
         model.addAttribute("comments", messagesService.findCommentsByMessage(messagesService.findById(id), pageable));
+        model.addAttribute("url", "/messages/" + id);
         model.addAttribute("availableEdit",
                 messagesService.availableEdit(message, currentUser));
 

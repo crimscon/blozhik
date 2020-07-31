@@ -28,7 +28,7 @@ public class Comment implements Serializable {
     private User user;
 
     @NotBlank(message = "Комментарий не может быть пустым")
-    @Length(max = 300, message = "Комментарий не должен быть больше 300 символов")
+    @Length(max = 1000, message = "Комментарий не должен быть больше 1000 символов")
     @Column(columnDefinition = "text")
     private String text;
 

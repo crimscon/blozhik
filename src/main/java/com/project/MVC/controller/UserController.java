@@ -2,8 +2,8 @@ package com.project.MVC.controller;
 
 import com.project.MVC.model.User;
 import com.project.MVC.model.dto.MessageDto;
+import com.project.MVC.model.enums.Gender;
 import com.project.MVC.model.enums.Role;
-import com.project.MVC.model.enums.Sex;
 import com.project.MVC.service.MessagesService;
 import com.project.MVC.service.UserService;
 import org.springframework.data.domain.Page;
@@ -105,13 +105,13 @@ public class UserController {
         User user = (User) userService.loadUserByUsername(username);
 
         if (currentUser.equals(user)) {
-            model.addAttribute("profile", currentUser);
+            model.addAttribute("profile", user);
 
-            if (currentUser.getUserProfile() != null && currentUser.getUserProfile().getDateOfBirth() != null)
+            if (user.getUserProfile() != null && user.getUserProfile().getDateOfBirth() != null)
                 model.addAttribute("convertedDate",
-                        messagesService.convertDate(currentUser.getUserProfile().getDateOfBirth()));
+                        messagesService.convertDate(user.getUserProfile().getDateOfBirth()));
             model.addAttribute("url", "/edit");
-            model.addAttribute("genders", Sex.values());
+            model.addAttribute("genders", Gender.values());
             model.addAttribute("isCurrentUser", currentUser.equals(user));
 
             return "user/userEdit";
@@ -120,7 +120,7 @@ public class UserController {
 
     @PostMapping("{username}/edit")
     public String saveEditForm(@RequestParam String password,
-                               @RequestParam(required = false) Sex gender,
+                               @RequestParam(required = false) Gender gender,
                                @RequestParam(required = false) String phoneNumber,
                                @RequestParam(required = false) String dateOfBirth,
                                @RequestParam String email,

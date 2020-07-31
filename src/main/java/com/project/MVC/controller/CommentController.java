@@ -40,6 +40,6 @@ public class CommentController {
             messagesService.addComment(messageId, comment, user);
         }
 
-        return "redirect:/messages/{messageId}";
+        return "redirect:/messages/{messageId}/#commentBlock";
     }
 }

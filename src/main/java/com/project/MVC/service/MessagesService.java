@@ -154,12 +154,10 @@ public class MessagesService {
 
     public void addComment(Long messageId, Comment comment, User user) {
         Message message = findById(messageId);
+        comment.setText(MessageUtil.createText(comment.getText()));
         comment.setUser(user);
         comment.setMessage(message);
         commentRepository.save(comment);
-
-        Set<Comment> comments = message.getComments();
-        comments.add(comment);
     }
 
     public Page<Comment> findCommentsByMessage(Message message, Pageable pageable) {

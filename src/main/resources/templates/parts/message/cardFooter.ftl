@@ -2,7 +2,7 @@
 
 <div class="card-footer bg-transparent position-relative">
     <div class="row justify-content-between">
-        <div class="<#if availableEdit??>col<#else>col-5</#if> pl-1">
+        <div class="<#if availableEdit??>col<#else>col-6</#if> pl-1">
             <div class="btn-group" role="group" aria-label="Basic example">
                 <a href="/messages/${message.getId()}/like" class="btn btn-outline-${message.getColor()?lower_case}">
                     <#if message.getMeLiked()>
@@ -25,14 +25,14 @@
                                     class="far fa-trash-alt"></i></a>
                     </#if>
                 <#else>
-                    <a href="/messages/${message.getId()}/#commentBLock"
+                    <a href="/messages/${message.getId()}/#commentBlock"
                        class="btn btn-outline-${message.getColor()?lower_case}"><i
                                 class="fas fa-comment-alt"></i>
                         ${message.getComments()}</a>
                 </#if>
             </div>
         </div>
-        <div class="<#if availableEdit??>col<#else>col-7</#if> pr-1">
+        <div class="<#if availableEdit??>col<#else>col-6</#if> pr-1">
             <div class="media">
                 <div class="media-body pr-1">
                     <#if availableEdit??>

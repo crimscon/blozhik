@@ -113,10 +113,10 @@
                                         <div class="custom-file">
                                             <input type="file" name="picture" accept=".jpg, .jpeg, .png"
                                                    class="custom-file-input"
-                                                   id="inputFile" aria-describedby="inputGroupFileAddon01">
+                                                   id="customFile" aria-describedby="inputGroupFileAddon01">
                                             <label id="send"
                                                    class="custom-file-label border-bottom border-${colorMessage}"
-                                                   for="inputFile"></label>
+                                                   for="customFile"></label>
                                         </div>
                                     </div>
                                     <#if errors?? && errors.filenameError??>
