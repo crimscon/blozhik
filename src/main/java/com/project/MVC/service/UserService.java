@@ -2,8 +2,8 @@ package com.project.MVC.service;
 
 import com.project.MVC.model.User;
 import com.project.MVC.model.UserProfile;
+import com.project.MVC.model.enums.Gender;
 import com.project.MVC.model.enums.Role;
-import com.project.MVC.model.enums.Sex;
 import com.project.MVC.repository.UserProfileRepository;
 import com.project.MVC.repository.UserRepository;
 import com.project.MVC.util.ThumbnailUtil;
@@ -110,7 +110,7 @@ public class UserService implements UserDetailsService {
 
     public void saveUser(User user, String email, String password,
                          MultipartFile file,
-                         Sex gender, String phoneNumber, String dateOfBirth) throws IOException {
+                         Gender gender, String phoneNumber, String dateOfBirth) throws IOException {
         UserProfile userProfile = user.getUserProfile() == null ?
                 new UserProfile() : userProfileRepo.getOne(user.getUserProfile().getId());
 

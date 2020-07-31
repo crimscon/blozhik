@@ -51,6 +51,9 @@ public class Message implements Serializable {
     )
     private Set<User> likes = new HashSet<>();
 
+    @OneToMany(mappedBy = "message")
+    private Set<Comment> comments = new HashSet<>();
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User author;

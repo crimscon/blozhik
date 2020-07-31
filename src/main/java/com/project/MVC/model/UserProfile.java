@@ -1,6 +1,6 @@
 package com.project.MVC.model;
 
-import com.project.MVC.model.enums.Sex;
+import com.project.MVC.model.enums.Gender;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,7 +21,7 @@ public class UserProfile implements Serializable {
 
     @Enumerated(EnumType.STRING)
     @Column(length = 10)
-    private Sex gender = Sex.Male;
+    private Gender gender = Gender.MALE;
 
     @Column(name = "dob")
     private LocalDateTime dateOfBirth = LocalDateTime.now();
@@ -29,12 +29,12 @@ public class UserProfile implements Serializable {
     @Column(name = "phone_number")
     private String phoneNumber = "";
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @OneToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    public UserProfile(Sex sex, LocalDateTime dateOfBirth, String phoneNumber) {
-        this.gender = sex;
+    public UserProfile(Gender gender, LocalDateTime dateOfBirth, String phoneNumber) {
+        this.gender = gender;
         this.dateOfBirth = dateOfBirth;
         this.phoneNumber = phoneNumber;
     }

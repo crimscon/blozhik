@@ -1,5 +1,5 @@
 package com.project.MVC.model.enums;
 
-public enum Sex {
-    Male, Female
+public enum Gender {
+    MALE, FEMALE
 }

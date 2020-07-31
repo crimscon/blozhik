@@ -20,6 +20,7 @@ public class MessageDto {
     private final Long likes;
     private final Boolean meLiked;
     private final Long viewers;
+    private final Integer comments;
 
     public MessageDto(Message message, Long likes, boolean meLiked) {
         this.id = message.getId();
@@ -31,6 +32,7 @@ public class MessageDto {
         this.color = message.getColor();
         this.date = message.getDate();
         this.viewers = message.getViewers();
+        this.comments = message.getComments().size();
         this.likes = likes;
         this.meLiked = meLiked;
     }
