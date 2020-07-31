@@ -91,3 +91,16 @@ input[type="radio"] + label span, input[type="radio"]:checked + label span {
     background: lightgray;
     margin: 1rem 0;
 }
+
+@media (min-width: 768px) {
+    .card-columns {
+        column-count: 2;
+    }
+}
+@media (min-width: 992px) {
+    .card-columns {
+        column-count: 2;
+    }
+}
+
+

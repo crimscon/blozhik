@@ -72,6 +72,8 @@ public class MessagesService {
 
     public boolean deleteMessage(Long id, User currentUser) throws IOException {
         MessageDto message = findById(currentUser, id);
+        Set<Comment> comments = findById(id).getComments();
+        comments.forEach(commentRepository::delete);
 
         if (currentUser.getId().equals(message.getAuthor().getId()) || currentUser.getRoles().contains(Role.ADMIN)) {
             if (message.getFilename() != null) {

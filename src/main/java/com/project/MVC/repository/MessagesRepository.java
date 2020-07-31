@@ -10,6 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface MessagesRepository extends JpaRepository<Message, Long> {
 
@@ -51,4 +53,9 @@ public interface MessagesRepository extends JpaRepository<Message, Long> {
             "where ml = :user " +
             "group by m")
     Page<MessageDto> findWhereMeLiked(Pageable pageable, @Param("user") User user);
+
+    @Query("select m from Message m left join m.likes ml " +
+            "where ml = :user " +
+            "group by m")
+    List<Message> findAllWhereUserLike(@Param("user") User user);
 }

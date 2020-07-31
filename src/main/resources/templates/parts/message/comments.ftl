@@ -3,7 +3,7 @@
 
 <form method="post" action="/messages/${message.getId()}/addComment">
     <div class="row mb-3">
-        <div class="col-8 col-lg-10 pr-0">
+        <div class="col-8 col-lg-11 pr-0">
             <textarea name="text" class="form-control shadow-none
                                     ${(invalids?? && invalids.textError??)?string('is-invalid', '')}"
                       id="TextArea" rows="5" placeholder="Введите комментарий"
@@ -15,8 +15,8 @@
             </#if>
             <input type="hidden" name="_csrf" value="${_csrf.token}"/>
         </div>
-        <div class="col-4 col-lg-2">
-            <button class="btn btn-outline-${message.getColor()?lower_case} btn-block p-0" style="height: 100%"
+        <div class="col-4 col-lg-1">
+            <button class="btn btn-${message.getColor()?lower_case} btn-block p-0" style="height: 100%"
                     type="submit"><i class="fas fa-arrow-circle-right"></i>
             </button>
         </div>

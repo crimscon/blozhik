@@ -1,9 +1,13 @@
 package com.project.MVC.service;
 
+import com.project.MVC.model.Comment;
+import com.project.MVC.model.Message;
 import com.project.MVC.model.User;
 import com.project.MVC.model.UserProfile;
 import com.project.MVC.model.enums.Gender;
 import com.project.MVC.model.enums.Role;
+import com.project.MVC.repository.CommentRepository;
+import com.project.MVC.repository.MessagesRepository;
 import com.project.MVC.repository.UserProfileRepository;
 import com.project.MVC.repository.UserRepository;
 import com.project.MVC.util.ThumbnailUtil;
@@ -25,14 +29,20 @@ import java.util.stream.Collectors;
 public class UserService implements UserDetailsService {
     private final UserRepository userRepo;
     private final UserProfileRepository userProfileRepo;
+    private final MessagesService messagesService;
+    private final MessagesRepository messagesRepository;
+    private final CommentRepository commentRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Value("${upload.path}")
     private String uploadPath;
 
-    public UserService(UserRepository userRepo, UserProfileRepository userProfileRepo, @Lazy PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepo, UserProfileRepository userProfileRepo, MessagesService messagesService, MessagesRepository messagesRepository, CommentRepository commentRepository, @Lazy PasswordEncoder passwordEncoder) {
         this.userRepo = userRepo;
         this.userProfileRepo = userProfileRepo;
+        this.messagesService = messagesService;
+        this.messagesRepository = messagesRepository;
+        this.commentRepository = commentRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -187,6 +197,21 @@ public class UserService implements UserDetailsService {
     public void deleteUser(User user) throws IOException {
 
         UserProfile userProfile = user.getUserProfile();
+        Set<Message> messages = user.getMessages();
+        Set<Comment> comments = user.getComments();
+        List<Message> likes = messagesRepository.findAllWhereUserLike(user);
+
+        comments.forEach(commentRepository::delete);
+        likes.forEach(message -> {
+            message.getLikes().remove(user);
+            messagesRepository.save(message);
+        });
+        messages.forEach(message -> {
+            Set<Comment> commentSet = message.getComments();
+            commentSet.forEach(commentRepository::delete);
+            messagesRepository.delete(message);
+        });
+
 
         if (userProfile != null) {
             userProfileRepo.delete(userProfile);

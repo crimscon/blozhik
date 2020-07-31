@@ -1,6 +1,5 @@
 function GetButtons() {
 
-    // noinspection JSJQueryEfficiency
     return {
 
         buttonSelf: $(`.modal-footer`).find(`#dropdownMenuButton`),
