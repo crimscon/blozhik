@@ -50,6 +50,8 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     Set<Message> messages;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    Set<Comment> comments;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

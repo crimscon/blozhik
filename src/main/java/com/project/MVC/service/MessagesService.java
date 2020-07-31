@@ -1,10 +1,12 @@
 package com.project.MVC.service;
 
+import com.project.MVC.model.Comment;
 import com.project.MVC.model.Message;
 import com.project.MVC.model.User;
 import com.project.MVC.model.dto.MessageDto;
 import com.project.MVC.model.enums.Color;
 import com.project.MVC.model.enums.Role;
+import com.project.MVC.repository.CommentRepository;
 import com.project.MVC.repository.MessagesRepository;
 import com.project.MVC.util.MessageUtil;
 import com.project.MVC.util.ThumbnailUtil;
@@ -24,12 +26,14 @@ import java.util.Set;
 public class MessagesService {
 
     private final MessagesRepository messagesRepository;
+    private final CommentRepository commentRepository;
 
     @Value("${upload.path}")
     private String uploadPath;
 
-    public MessagesService(MessagesRepository messagesRepository) {
+    public MessagesService(MessagesRepository messagesRepository, CommentRepository commentRepository) {
         this.messagesRepository = messagesRepository;
+        this.commentRepository = commentRepository;
     }
 
     public void createMessage(Message message,
@@ -143,11 +147,22 @@ public class MessagesService {
         Message message = findById(id);
         Set<User> likes = message.getLikes();
 
-        if (likes.contains(user))
-            likes.remove(user);
-        else
-            likes.add(user);
+        likes.add(user);
 
         messagesRepository.save(message);
+    }
+
+    public void addComment(Long messageId, Comment comment, User user) {
+        Message message = findById(messageId);
+        comment.setUser(user);
+        comment.setMessage(message);
+        commentRepository.save(comment);
+
+        Set<Comment> comments = message.getComments();
+        comments.add(comment);
+    }
+
+    public Page<Comment> findCommentsByMessage(Message message, Pageable pageable) {
+        return commentRepository.findCommentsByMessage(message, pageable);
     }
 }

@@ -27,7 +27,7 @@ import java.text.DecimalFormat;
 import java.util.Map;
 
 @Controller
-@SessionAttributes(names = {"errors", "errorMessage"})
+@SessionAttributes(names = {"errors", "errorMessage", "invalids", "invalidComment"})
 public class MessagesController {
 
     private final MessagesService messagesService;
@@ -89,8 +89,7 @@ public class MessagesController {
 
             errors.put("url", "add");
 
-            model.addAttribute("errors", errors);
-            model.addAttribute("errorMessage", message);
+
         } else {
             messagesService.createMessage(message, file, user, color);
         }
@@ -124,14 +123,16 @@ public class MessagesController {
     public String getMessage(@PathVariable Long id,
                              SessionStatus status,
                              @AuthenticationPrincipal User currentUser,
-                             Model model) {
+                             Model model,
+                             @PageableDefault(sort = {"id"},
+                                     direction = Sort.Direction.DESC) Pageable pageable) {
         MessageDto message = messagesService.findById(currentUser, id);
-
         messagesService.addViewers(message);
 
         model.addAttribute("message", message);
         model.addAttribute("convertedDateMessage", messagesService.convertDate(message.getDate()));
         model.addAttribute("author", userService.findById(message.getAuthor().getId()));
+        model.addAttribute("comments", messagesService.findCommentsByMessage(messagesService.findById(id), pageable));
         model.addAttribute("availableEdit",
                 messagesService.availableEdit(message, currentUser));
 
