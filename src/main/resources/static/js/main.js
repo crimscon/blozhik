@@ -76,7 +76,7 @@ document.addEventListener("DOMContentLoaded", function () {
 })
 
 window.addEventListener("DOMContentLoaded", function () {
-    [].forEach.call(document.querySelectorAll('.tel'), function (input) {
+    [].forEach.call(document.querySelectorAll('#newTel'), function (input) {
         var keyCode;
 
         function mask(event) {

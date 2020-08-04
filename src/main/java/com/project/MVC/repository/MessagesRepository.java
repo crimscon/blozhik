@@ -58,4 +58,7 @@ public interface MessagesRepository extends JpaRepository<Message, Long> {
             "where ml = :user " +
             "group by m")
     List<Message> findAllWhereUserLike(@Param("user") User user);
+
+    @Query("select count(m) from Message m where m.author = :user")
+    Integer findCountMessagesByUser(@Param("user") User user);
 }

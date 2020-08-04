@@ -129,28 +129,11 @@
 </#macro>
 
 <#macro logout>
-    <#if user??>
-        <#if user.getProfile_pic()??>
-            <a href="../../${user.getUsername()}/profile"><img src="/img/thumbs/${user.getProfile_pic()}"
-                                                               class="d-none d-lg-block align-self-center img-fluid rounded-circle mr-2"
-                                                               alt="..."></a>
-        <#else>
-            <a href="../../${user.getUsername()}/profile" class=""><img src="/static/img/avatar.svg" id="imageResource"
-                                                                        class="d-none d-lg-block border-none rounded-circle mr-2"
-                                                                        style="background-color: #cacaca!important"
-                                                                        height="40px"
-                                                                        width="40px"></a>
-        </#if>
-        <div class="btn-group d-md d-lg-none" role="group" aria-label="Buttons profile and logout">
-            <form action="/logout" method="post">
-                <a href="../../${user.getUsername()}/profile" class="btn btn-outline-light">${name}</a>
-                <button class="btn btn-outline-light ml-2" type="submit">
-                    <input name="_csrf" value="${_csrf.token}" hidden>
-                    <i class="fas fa-sign-out-alt"></i>
-                </button>
-            </form>
-        </div>
-    <#else>
-        <a href="../../login" class="btn btn-outline-light my-2 my-sm-0">Войти <i class="fas fa-sign-in-alt"></i></a>
-    </#if>
+
+    <form action="/logout" method="post">
+        <button class="dropdown-item p-3 px-lg-4 py-lg-1" type="submit">
+            <input name="_csrf" value="${_csrf.token}" hidden>
+            <div class="text-danger">Выйти</div>
+        </button>
+    </form>
 </#macro>

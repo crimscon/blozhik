@@ -8,8 +8,10 @@
               integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk"
               crossorigin="anonymous">
         <link rel="stylesheet" href="../../static/css/style.css">
+        <link rel="icon" href="../../static/img/logo.png" type="image/png">
         <!--Let browser know website is optimized for mobile-->
         <title>Бложик</title>
+        <meta name="theme-color" content="#343a40">
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     </head>
 

@@ -9,7 +9,6 @@
                      class="rounded profilePic" alt="${profile.getUsername()}">
             </#if>
         </figure>
-
         <#if isCurrentUser>
             <div class="card <#if url == "/edit">bg-dark</#if>">
                 <div class="row justify-content-between">
@@ -17,17 +16,6 @@
                         <a class="text-decoration-none stretched-link <#if url == "/edit">text-light<#else>text-dark</#if>"
                            href="edit">
                             <i class="fas fa-user-edit"></i> Редактировать
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card <#if url == "/liked">bg-dark</#if> mt-2">
-                <div class="row justify-content-between">
-                    <div class="col-12 p-3">
-                        <a class="text-decoration-none stretched-link <#if url == "/liked">text-light<#else>text-dark</#if>"
-                           href="liked">
-                            <i class="fas fa-heart text-danger"></i> Понравившееся
                         </a>
                     </div>
                 </div>
@@ -45,6 +33,26 @@
                     </div>
                 </button>
             </form>
+        <#else>
+            <#if !isCurrentUser>
+                <div class="card <#if meSubscribe>bg-dark</#if>">
+                    <div class="row justify-content-between">
+                        <div class="col-12 p-3">
+                            <#if !meSubscribe>
+                                <a class="text-decoration-none stretched-link text-dark"
+                                   href="subscribe">
+                                    <i class="fas fa-user-alt"></i> Подписаться
+                                </a>
+                            <#else>
+                                <a class="text-decoration-none stretched-link text-light"
+                                   href="unsubscribe">
+                                    <i class="fas fa-user-alt-slash"></i> Отписаться
+                                </a>
+                            </#if>
+                        </div>
+                    </div>
+                </div>
+            </#if>
         </#if>
     </div>
 </div>

@@ -1,8 +1,15 @@
 package com.project.MVC.util;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Arrays;
+import java.util.Date;
 
 public abstract class MessageUtil {
+    public static Object convertDate(LocalDateTime date) {
+        return Date.from(date.atZone(ZoneId.systemDefault()).toInstant());
+    }
+
     public static String createText(String text) {
         text = text.replaceAll("<", "&lt;");
         text = text.replaceAll(">", "&gt;");

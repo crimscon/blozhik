@@ -18,8 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
 import java.util.Set;
 
 @Service
@@ -72,14 +70,13 @@ public class MessagesService {
 
     public boolean deleteMessage(Long id, User currentUser) throws IOException {
         MessageDto message = findById(currentUser, id);
-        Set<Comment> comments = findById(id).getComments();
-        comments.forEach(commentRepository::delete);
 
         if (currentUser.getId().equals(message.getAuthor().getId()) || currentUser.getRoles().contains(Role.ADMIN)) {
             if (message.getFilename() != null) {
                 ThumbnailUtil.deleteIfExistFile(uploadPath, message.getFilename());
             }
-
+            Set<Comment> comments = findById(id).getComments();
+            comments.forEach(commentRepository::delete);
             messagesRepository.delete(messagesRepository.getOne(message.getId()));
 
             return true;
@@ -141,15 +138,12 @@ public class MessagesService {
         messagesRepository.save(message);
     }
 
-    public Object convertDate(LocalDateTime date) {
-        return Date.from(date.atZone(ZoneId.systemDefault()).toInstant());
-    }
-
     public void like(User user, Long id) {
         Message message = findById(id);
         Set<User> likes = message.getLikes();
 
-        likes.add(user);
+        if (likes.contains(user)) likes.remove(user);
+        else likes.add(user);
 
         messagesRepository.save(message);
     }
@@ -164,5 +158,13 @@ public class MessagesService {
 
     public Page<Comment> findCommentsByMessage(Message message, Pageable pageable) {
         return commentRepository.findCommentsByMessage(message, pageable);
+    }
+
+    public Integer findUserMessageCount(User user) {
+        return messagesRepository.findCountMessagesByUser(user);
+    }
+
+    public Integer findUserLikes(User user) {
+        return messagesRepository.findAllWhereUserLike(user).size();
     }
 }
