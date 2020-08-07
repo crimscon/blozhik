@@ -32,24 +32,23 @@ public abstract class ControllerUtil {
 
     private static boolean isFillObject(Object object, MultipartFile file) {
         if (object instanceof Message) {
-            return !((Message) object).getText().isEmpty() && (file == null || file.isEmpty());
+            return !(((Message) object).getText().isEmpty() && (file == null || file.isEmpty()));
         } else if (object instanceof User) {
             return false;
         } else return false;
     }
 
     public static boolean hasErrors(BindingResult bindingResult, Object object, MultipartFile file) {
-
-        return bindingResult.hasErrors() || isFillObject(object, file) || isTooBigFile(file);
+        return bindingResult.hasErrors() || !isFillObject(object, file) || isTooBigFile(file);
     }
 
     public static void addErrorsToModel(BindingResult bindingResult, Message message, MultipartFile file, Model model) {
 
         Map<String, String> errors = ControllerUtil.getErrors(bindingResult);
 
-        if (isFillObject(message, file) && message.getTitle().isEmpty())
+        if (!isFillObject(message, file) && message.getTitle().isEmpty())
             errors.put("fillError", "Необходимо заполнить хотя бы одно поле");
-        else if (isFillObject(message, file) && !message.getTitle().isEmpty())
+        else if (!isFillObject(message, file) && !message.getTitle().isEmpty())
             errors.put("titleError", "Нельзя отправить сообщение только с заголовком");
         else if (isTooBigFile(file)) {
             double fileWeight = (double) file.getSize() / 1024;

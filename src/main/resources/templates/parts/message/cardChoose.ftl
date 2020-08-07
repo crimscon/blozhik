@@ -14,7 +14,7 @@
         <#include "cardFooter.ftl">
     </div>
 <#elseif message.getFilename()?? && message.getTitle() != "">
-    <div class="card bg-${message.color?lower_case}">
+    <div class="card border-${message.color?lower_case}">
         <img src="/img/thumbs/${message.filename}" class="card-img-top">
         <h4 class="card-header alert-${message.color?lower_case}">${message.getTitle()}</h4>
         <#if convertedDateMessage??>
