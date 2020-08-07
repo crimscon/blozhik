@@ -6,6 +6,7 @@
 При первом запуске проекта нас сразу 
 отправляет на страницу авторизации, но 
 так как у нас нет пользователя, его нужно создать!
+
 <img src="https://github.com/Crimscon/MVC/blob/master/readme/images/registerFill.png" width="100%">
 
 После создания первого пользователя, ему автоматически присваиваются права администратора. Все последующие 
@@ -14,38 +15,46 @@
 ### Сообщения
 После авторизации, мы уже можем создавать сообщения. 
 В данный момент поддерживаются несколько видов сообщений, приведу примеры некоторых из них.
+
 <img src="https://github.com/Crimscon/MVC/blob/master/readme/images/addMessage1.png" width="100%">
 
 <img src="https://github.com/Crimscon/MVC/blob/master/readme/images/addMessage2.png" width="100%">
 
-<img src="https://github.com/Crimscon/MVC/blob/master/readme/images/addMessage3.png" width="100%">
-
 При этом, поддерживается и валидация, как вариант. Вариации сообщения только с заголовком быть не может
+
 <img src="https://github.com/Crimscon/MVC/blob/master/readme/images/valid.png" width="100%">
 
+<img src="https://github.com/Crimscon/MVC/blob/master/readme/images/addMessage3.png" width="100%">
+
 Давайте посмотрим как выглядит страница с сообщениями сейчас
+
 <img src="https://github.com/Crimscon/MVC/blob/master/readme/images/messages.png" width="100%">
 
 Само же сообщение выглядит вот так
+
 <img src="https://github.com/Crimscon/MVC/blob/master/readme/images/comments.png" width="100%">
 
 Пагинация ограничивает не более 10 постов на странице.
 
 ### Редактирование
 Мы так же можем редактировать свой профиль. Поначалу, профиль пользователя практически не заполнен, давайте заполним.
+
 <img src="https://github.com/Crimscon/MVC/blob/master/readme/images/editUser.png" width="100%">
 <img src="https://github.com/Crimscon/MVC/blob/master/readme/images/userProfile.png" width="100%">
 
 На нас еще и подписались. Посмотрим кто? :)
+
 <img src="https://github.com/Crimscon/MVC/blob/master/readme/images/userSubs.png" width="100%">
 
 
 ### Управление учетными записями
 Будучи администратором с регистрации, мы видим в навбаре проекта вкладку "Список пользователей". 
 На данный момент это единственное место, откуда можно посмотреть всех пользователей, которые есть в системе
+
 <img src="https://github.com/Crimscon/MVC/blob/master/readme/images/adminTable.png" width="100%">
 
 Нажимая на логин, мы оказываемся в профиле пользователя. Если же нажмем на Edit, то перейдем в окно редактирования
+
 <img src="https://github.com/Crimscon/MVC/blob/master/readme/images/adminEdit.png" width="100%">
 
 Кнопка Delete - удаляет пользователя и все его упоминания. Все лайки, комментарии и посты.
