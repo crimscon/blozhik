@@ -20,7 +20,7 @@
 
 <img src="https://github.com/Crimscon/MVC/blob/master/readme/images/addMessage2.png" width="100%">
 
-При этом, поддерживается и валидация, как вариант. Вариации сообщения только с заголовком быть не может
+При этом, поддерживается и валидация. Вариации сообщения только с заголовком быть не может
 
 <img src="https://github.com/Crimscon/MVC/blob/master/readme/images/valid.png" width="100%">
 
