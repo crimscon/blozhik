@@ -2,10 +2,14 @@ package com.project.MVC.util;
 
 import com.project.MVC.model.Message;
 import com.project.MVC.model.User;
+import com.project.MVC.model.enums.Color;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.text.DecimalFormat;
 import java.util.Map;
@@ -26,9 +30,9 @@ public abstract class ControllerUtil {
         return ((file != null || !file.isEmpty()) && ((file.getSize() / 1024) > 5000));
     }
 
-    private static boolean isFillObject(Object object) {
+    private static boolean isFillObject(Object object, MultipartFile file) {
         if (object instanceof Message) {
-            return ((Message) object).getText().isEmpty();
+            return !((Message) object).getText().isEmpty() && (file == null || file.isEmpty());
         } else if (object instanceof User) {
             return false;
         } else return false;
@@ -36,16 +40,16 @@ public abstract class ControllerUtil {
 
     public static boolean hasErrors(BindingResult bindingResult, Object object, MultipartFile file) {
 
-        return bindingResult.hasErrors() || isFillObject(object) || isTooBigFile(file);
+        return bindingResult.hasErrors() || isFillObject(object, file) || isTooBigFile(file);
     }
 
     public static void addErrorsToModel(BindingResult bindingResult, Message message, MultipartFile file, Model model) {
 
         Map<String, String> errors = ControllerUtil.getErrors(bindingResult);
 
-        if (isFillObject(message) && message.getTitle().isEmpty())
+        if (isFillObject(message, file) && message.getTitle().isEmpty())
             errors.put("fillError", "Необходимо заполнить хотя бы одно поле");
-        else if (isFillObject(message) && !message.getTitle().isEmpty())
+        else if (isFillObject(message, file) && !message.getTitle().isEmpty())
             errors.put("titleError", "Нельзя отправить сообщение только с заголовком");
         else if (isTooBigFile(file)) {
             double fileWeight = (double) file.getSize() / 1024;
@@ -63,5 +67,27 @@ public abstract class ControllerUtil {
         model.addAttribute("errors", errors);
         model.addAttribute("errorMessage", message);
 
+    }
+
+    public static void addModelSubsPart(Model model, User channel, User currentUser) {
+        if (channel.getSubscribers().contains(currentUser)) {
+            model.addAttribute("meSubscribe", true);
+        } else model.addAttribute("meSubscribe", false);
+
+        model.addAttribute("subscribers", channel.getSubscribers().size());
+        model.addAttribute("subscriptions", channel.getSubscriptions().size());
+    }
+
+    public static void addMessageSendPart(Model model) {
+        model.addAttribute("messageSend", true);
+        model.addAttribute("colors", Color.values());
+    }
+
+    public static String createRedirect(RedirectAttributes redirectAttributes, String referer) {
+        UriComponents componentsBuilder = UriComponentsBuilder.fromHttpUrl(referer).build();
+
+        componentsBuilder.getQueryParams().forEach(redirectAttributes::addAttribute);
+
+        return "redirect:" + componentsBuilder.getPath();
     }
 }

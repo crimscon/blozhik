@@ -1,9 +1,13 @@
 package com.project.MVC.service;
 
+import com.project.MVC.model.Comment;
+import com.project.MVC.model.Message;
 import com.project.MVC.model.User;
 import com.project.MVC.model.UserProfile;
 import com.project.MVC.model.enums.Gender;
 import com.project.MVC.model.enums.Role;
+import com.project.MVC.repository.CommentRepository;
+import com.project.MVC.repository.MessagesRepository;
 import com.project.MVC.repository.UserProfileRepository;
 import com.project.MVC.repository.UserRepository;
 import com.project.MVC.util.ThumbnailUtil;
@@ -27,13 +31,21 @@ public class UserService implements UserDetailsService {
     private final UserProfileRepository userProfileRepo;
     private final PasswordEncoder passwordEncoder;
 
+    private final MessagesService messagesService;
+    private final MessagesRepository messagesRepository;
+    private final CommentRepository commentRepository;
+
     @Value("${upload.path}")
     private String uploadPath;
 
-    public UserService(UserRepository userRepo, UserProfileRepository userProfileRepo, @Lazy PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepo, UserProfileRepository userProfileRepo, MessagesService messagesService, MessagesRepository messagesRepository, CommentRepository commentRepository, @Lazy PasswordEncoder passwordEncoder) {
         this.userRepo = userRepo;
         this.userProfileRepo = userProfileRepo;
         this.passwordEncoder = passwordEncoder;
+
+        this.messagesService = messagesService;
+        this.messagesRepository = messagesRepository;
+        this.commentRepository = commentRepository;
     }
 
     @Override
@@ -84,119 +96,164 @@ public class UserService implements UserDetailsService {
         user.setRoles(roleSet);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        save(user);
-    }
-
-    public void saveUser(String username, String password,
-                         Map<String, String> form, Long userId) {
-        User user = findById(userId);
-        user.setUsername(username);
-        user.setPassword(passwordEncoder.encode(password));
-
-        Set<String> roles = Arrays.stream(Role.values())
-                .map(Role::name)
-                .collect(Collectors.toSet());
-
-        user.getRoles().clear();
-
-        for (String key : form.keySet()) {
-            if (roles.contains(key)) {
-                user.getRoles().add(Role.valueOf(key));
-            }
-        }
-
         userRepo.save(user);
     }
-
-    public void saveUser(User user, String email, String password,
-                         MultipartFile file,
-                         Gender gender, String phoneNumber, String dateOfBirth) throws IOException {
-        UserProfile userProfile = user.getUserProfile() == null ?
-                new UserProfile() : userProfileRepo.getOne(user.getUserProfile().getId());
-
-        boolean passwordChange = false,
-                emailChange = false,
-                profilePicChange = false,
-                phoneChange = false,
-                dofChange = false,
-                profileChange = false,
-                genderChange = false;
-
-        if (user.getEmail() == null || !user.getEmail().equals(email) && !email.isEmpty()) {
-            emailChange = true;
-            user.setEmail(email);
-        }
-
-        if (!user.getPassword().equals(password) && !password.isEmpty()) {
-            passwordChange = true;
-            user.setPassword(passwordEncoder.encode(password));
-        }
-
-        if (!userProfile.getGender().equals(gender)) {
-            genderChange = true;
-            userProfile.setGender(gender);
-        }
-
-        if (!dateOfBirth.equals("") && !dateOfBirth.isEmpty()) {
-            String[] dateArr = dateOfBirth.split("-");
-
-            LocalDateTime localDate = LocalDateTime.of(Integer.parseInt(dateArr[0]), Integer.parseInt(dateArr[1]), Integer.parseInt(dateArr[2]), 0, 0);
-
-            if (!userProfile.getDateOfBirth().equals(localDate)) {
-                dofChange = true;
-                userProfile.setDateOfBirth(localDate);
-            }
-        }
-
-        if (!userProfile.getPhoneNumber().equals(phoneNumber) && !phoneNumber.isEmpty()) {
-            phoneChange = true;
-            userProfile.setPhoneNumber(phoneNumber);
-        }
-
-        if (phoneChange || dofChange || genderChange) {
-            profileChange = true;
-            userProfile.setUser(user);
-        }
-
-        if (profileChange) {
-            userProfileRepo.save(userProfile);
-            user.setUserProfile(userProfile);
-        }
-
-        if (file != null && !file.getOriginalFilename().isEmpty()) {
-
-            ThumbnailUtil.deleteIfExistFile(uploadPath, user.getProfile_pic());
-            String filename = ThumbnailUtil.createFile(file, uploadPath, false);
-
-            user.setProfile_pic(filename);
-            profilePicChange = true;
-        }
-
-        if (passwordChange || emailChange || profilePicChange || profileChange) userRepo.save(user);
-    }
-
 
     public List<User> findAll() {
         return userRepo.findAll();
     }
 
-    public void save(User user) {
-        userRepo.save(user);
-    }
+    public void deleteUser(User deletingUser, User currentUser) throws IOException {
 
-    public void deleteUser(User user) throws IOException {
+        UserProfile userProfile = deletingUser.getUserProfile();
+        Set<Message> messages = deletingUser.getMessages();
+        Set<Comment> comments = deletingUser.getComments();
+        List<Message> likes = messagesRepository.findAllWhereUserLike(deletingUser);
 
-        UserProfile userProfile = user.getUserProfile();
+        comments.forEach(commentRepository::delete);
+        likes.forEach(message -> {
+            message.getLikes().remove(deletingUser);
+            messagesRepository.save(message);
+        });
+        messages.forEach(message -> {
+            try {
+                messagesService.deleteMessage(message.getId(), currentUser);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
 
         if (userProfile != null) {
             userProfileRepo.delete(userProfile);
         }
-        if (!(user.getProfile_pic() == null || user.getProfile_pic().isEmpty())) {
-            ThumbnailUtil.deleteIfExistFile(uploadPath, user.getProfile_pic());
+        if (!(deletingUser.getProfile_pic() == null || deletingUser.getProfile_pic().isEmpty())) {
+            ThumbnailUtil.deleteIfExistFile(uploadPath, deletingUser.getProfile_pic());
         }
 
-        userRepo.delete(user);
+        userRepo.delete(deletingUser);
 
+    }
 
+    public void subscribe(User channel, User currentUser) {
+        channel.getSubscribers().add(currentUser);
+
+        userRepo.save(channel);
+    }
+
+    public void unsubscribe(User channel, User currentUser) {
+        channel.getSubscribers().remove(currentUser);
+
+        userRepo.save(channel);
+    }
+
+    public void changeProfilePart(User currentUser, User user, Gender gender, String dateOfBirth) {
+        if (currentUser.equals(user) || currentUser.getRoles().contains(Role.ADMIN)) {
+            UserProfile userProfile = user.getUserProfile() == null ?
+                    new UserProfile(user) : userProfileRepo.getOne(user.getUserProfile().getId());
+
+            boolean dofChange = false,
+                    genderChange = false;
+
+            if (!userProfile.getGender().equals(gender)) {
+                userProfile.setGender(gender);
+                genderChange = true;
+            }
+
+            if (!dateOfBirth.equals("") && !dateOfBirth.isEmpty()) {
+                String[] dateArr = dateOfBirth.split("-");
+
+                LocalDateTime localDate = LocalDateTime.of(Integer.parseInt(dateArr[0]), Integer.parseInt(dateArr[1]), Integer.parseInt(dateArr[2]), 0, 0);
+
+                if (!userProfile.getDateOfBirth().equals(localDate)) {
+                    dofChange = true;
+                    userProfile.setDateOfBirth(localDate);
+                }
+            }
+
+            if (dofChange || genderChange) {
+                userProfileRepo.save(userProfile);
+                user.setUserProfile(userProfile);
+                userRepo.save(user);
+            }
+        }
+    }
+
+    public void changeEmail(User currentUser, User user, String email) {
+        if (currentUser.equals(user) || currentUser.getRoles().contains(Role.ADMIN)) {
+            if (!user.getEmail().equals(email) || !email.isEmpty()) {
+                user.setEmail(email);
+                userRepo.save(user);
+            }
+        }
+    }
+
+    public void changePhone(User currentUser, User user, String phone) {
+        if (currentUser.equals(user) || currentUser.getRoles().contains(Role.ADMIN)) {
+            UserProfile userProfile = user.getUserProfile() == null ?
+                    new UserProfile() : userProfileRepo.getOne(user.getUserProfile().getId());
+
+            if (!userProfile.getPhoneNumber().equals(phone) || !phone.isEmpty()) {
+                userProfile.setPhoneNumber(phone);
+                user.setUserProfile(userProfile);
+
+                userProfileRepo.save(userProfile);
+                userRepo.save(user);
+            }
+        }
+    }
+
+    public void editPicture(User currentUser, User user, MultipartFile file) throws IOException {
+        if (currentUser.equals(user) || currentUser.getRoles().contains(Role.ADMIN)) {
+            if (file != null && !file.getOriginalFilename().isEmpty()) {
+                ThumbnailUtil.deleteIfExistFile(uploadPath, user.getProfile_pic());
+                String filename = ThumbnailUtil.createFile(file, uploadPath, false);
+
+                user.setProfile_pic(filename);
+            }
+        }
+
+    }
+
+    public void deletePicture(User currentUser, User user) throws IOException {
+        if (currentUser.equals(user) || currentUser.getRoles().contains(Role.ADMIN)) {
+            if (user.getProfile_pic() != null || !user.getProfile_pic().isEmpty()) {
+                ThumbnailUtil.deleteIfExistFile(uploadPath, user.getProfile_pic());
+                user.setProfile_pic(null);
+                userRepo.save(user);
+            }
+        }
+    }
+
+    public void changePassword(User currentUser, User user,
+                               String oldPassword, String newPassword, String newPasswordConfirm) {
+        if (currentUser.getRoles().contains(Role.ADMIN)) {
+            user.setPassword(passwordEncoder.encode(newPassword));
+            userRepo.save(user);
+        } else if (currentUser.equals(user)) {
+            if (passwordEncoder.matches(oldPassword, user.getPassword())
+                    && newPassword.equals(newPasswordConfirm)) {
+                user.setPassword(passwordEncoder.encode(newPassword));
+                userRepo.save(user);
+            }
+        }
+    }
+
+    public void changeRoles(User currentUser, User user, Map<String, String> form) {
+        if (currentUser.getRoles().contains(Role.ADMIN)) {
+
+            Set<String> roles = Arrays.stream(Role.values())
+                    .map(Role::name)
+                    .collect(Collectors.toSet());
+
+            user.getRoles().clear();
+
+            for (String key : form.keySet()) {
+                if (roles.contains(key)) {
+                    user.getRoles().add(Role.valueOf(key));
+                }
+            }
+
+            userRepo.save(user);
+        }
     }
 }

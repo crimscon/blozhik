@@ -1,6 +1,7 @@
 package com.project.MVC.model;
 
 import com.project.MVC.model.enums.Role;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,18 +11,21 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import java.io.Serializable;
 import java.util.Collection;
-import java.util.Objects;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Table(name = "usr")
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Getter
 @Setter
 @NoArgsConstructor
-public class User implements UserDetails {
+public class User implements UserDetails, Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @EqualsAndHashCode.Include
     private Long id;
 
     @NotBlank(message = "Логин не может быть пустым")
@@ -51,22 +55,22 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user")
     Set<Comment> comments;
 
+    @ManyToMany
+    @JoinTable(name = "user_subscriptions",
+            joinColumns = {@JoinColumn(name = "channel_id")},
+            inverseJoinColumns = {@JoinColumn(name = "subscriber_id")})
+    private Set<User> subscribers = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(name = "user_subscriptions",
+            joinColumns = {@JoinColumn(name = "subscriber_id")},
+            inverseJoinColumns = {@JoinColumn(name = "channel_id")})
+    private Set<User> subscriptions = new HashSet<>();
+
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return getRoles();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return id.equals(user.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
     }
 
     @Override

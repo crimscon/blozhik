@@ -27,7 +27,7 @@ public class UserProfile implements Serializable {
     private LocalDateTime dateOfBirth = LocalDateTime.now();
 
     @Column(name = "phone_number")
-    private String phoneNumber = "";
+    private String phoneNumber;
 
     @OneToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
@@ -39,4 +39,7 @@ public class UserProfile implements Serializable {
         this.phoneNumber = phoneNumber;
     }
 
+    public UserProfile(User user) {
+        this.user = user;
+    }
 }

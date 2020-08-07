@@ -2,6 +2,7 @@ package com.project.MVC.model;
 
 import com.project.MVC.model.enums.Color;
 import com.project.MVC.util.MessageUtil;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,16 +13,17 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 @Entity
 @NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Getter
 @Setter
 public class Message implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column
@@ -66,18 +68,5 @@ public class Message implements Serializable {
         this.announce = MessageUtil.createAnnounce(this.getText());
         this.author = author;
         this.color = color;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Message message = (Message) o;
-        return id.equals(message.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
     }
 }

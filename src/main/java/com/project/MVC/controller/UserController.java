@@ -6,6 +6,8 @@ import com.project.MVC.model.enums.Gender;
 import com.project.MVC.model.enums.Role;
 import com.project.MVC.service.MessagesService;
 import com.project.MVC.service.UserService;
+import com.project.MVC.util.ControllerUtil;
+import com.project.MVC.util.MessageUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -16,11 +18,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 @Controller
 @SessionAttributes(names = "errors")
@@ -43,11 +43,14 @@ public class UserController {
         model.addAttribute("profile", user);
         if (user.getUserProfile() != null && user.getUserProfile().getDateOfBirth() != null)
             model.addAttribute("convertedDate",
-                    messagesService.convertDate(user.getUserProfile().getDateOfBirth()));
+                    MessageUtil.convertDate(user.getUserProfile().getDateOfBirth()));
         model.addAttribute("isCurrentUser", currentUser.equals(user));
         model.addAttribute("url", "/profile");
+        model.addAttribute("messagesCount", messagesService.findUserMessageCount(user));
+        model.addAttribute("likedCount", messagesService.findUserLikes(user));
 
-        MessagesController.addMessageSendPart(model);
+        ControllerUtil.addModelSubsPart(model, user, currentUser);
+        ControllerUtil.addMessageSendPart(model);
 
         status.setComplete();
 
@@ -69,7 +72,8 @@ public class UserController {
         model.addAttribute("isCurrentUser", currentUser.equals(user));
         model.addAttribute("url", "/messages");
 
-        MessagesController.addMessageSendPart(model);
+        ControllerUtil.addModelSubsPart(model, user, currentUser);
+        ControllerUtil.addMessageSendPart(model);
 
         status.setComplete();
 
@@ -78,10 +82,10 @@ public class UserController {
 
     @GetMapping("{username}/liked")
     public String getLikedMessages(@AuthenticationPrincipal User currentUser,
-                                  @PathVariable String username,
+                                   @PathVariable String username,
                                    SessionStatus status,
-                                  @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable,
-                                  Model model) {
+                                   @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable,
+                                   Model model) {
         User user = (User) userService.loadUserByUsername(username);
 
         Page<MessageDto> page = messagesService.findWhereMeLiked(pageable, user);
@@ -91,44 +95,51 @@ public class UserController {
         model.addAttribute("isCurrentUser", currentUser.equals(user));
         model.addAttribute("url", "/liked");
 
-        MessagesController.addMessageSendPart(model);
+        ControllerUtil.addModelSubsPart(model, user, currentUser);
+        ControllerUtil.addMessageSendPart(model);
 
         status.setComplete();
 
         return "user/userMessages";
     }
 
-    @GetMapping("{username}/edit")
-    public String getEditForm(@AuthenticationPrincipal User currentUser,
-                              @PathVariable String username,
-                              Model model) {
-        User user = (User) userService.loadUserByUsername(username);
-
-        if (currentUser.equals(user)) {
-            model.addAttribute("profile", user);
-
-            if (user.getUserProfile() != null && user.getUserProfile().getDateOfBirth() != null)
-                model.addAttribute("convertedDate",
-                        messagesService.convertDate(user.getUserProfile().getDateOfBirth()));
-            model.addAttribute("url", "/edit");
-            model.addAttribute("genders", Gender.values());
-            model.addAttribute("isCurrentUser", currentUser.equals(user));
-
-            return "user/userEdit";
-        } else return "redirect:/{username}/profile";
-    }
-
-    @PostMapping("{username}/edit")
-    public String saveEditForm(@RequestParam String password,
-                               @RequestParam(required = false) Gender gender,
-                               @RequestParam(required = false) String phoneNumber,
-                               @RequestParam(required = false) String dateOfBirth,
-                               @RequestParam String email,
-                               @RequestParam("profile_pic") MultipartFile file,
-                               @AuthenticationPrincipal User user) throws IOException {
-        userService.saveUser(user, email, password, file, gender, phoneNumber, dateOfBirth);
+    @GetMapping("{username}/subscribe")
+    public String subscribe(@PathVariable String username,
+                            @AuthenticationPrincipal User currentUser) {
+        userService.subscribe(userService.getUserByUsername(username), currentUser);
 
         return "redirect:/{username}/profile";
+    }
+
+    @GetMapping("{username}/unsubscribe")
+    public String unsubscribe(@PathVariable String username,
+                              @AuthenticationPrincipal User currentUser) {
+        userService.unsubscribe(userService.getUserByUsername(username), currentUser);
+
+        return "redirect:/{username}/profile";
+    }
+
+    @GetMapping("{username}/{type}/list")
+    public String subsList(@PathVariable String username,
+                           @PathVariable String type,
+                           @AuthenticationPrincipal User currentUser,
+                           Model model) {
+        User user = userService.getUserByUsername(username);
+
+        if ("subscribers".equals(type)) {
+            model.addAttribute("subs", user.getSubscribers());
+        } else {
+            model.addAttribute("subs", user.getSubscriptions());
+        }
+
+        model.addAttribute("profile", user);
+        model.addAttribute("isCurrentUser", currentUser.equals(user));
+        model.addAttribute("url", type);
+
+        ControllerUtil.addModelSubsPart(model, user, currentUser);
+        ControllerUtil.addMessageSendPart(model);
+
+        return "user/subsList";
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -146,29 +157,21 @@ public class UserController {
     @GetMapping("/users/{userId}")
     public String userEditForm(@PathVariable Long userId, Model model) {
         User user = userService.findById(userId);
-        model.addAttribute("user", user);
+        model.addAttribute("profile", user);
+        model.addAttribute("genders", Gender.values());
         model.addAttribute("roles", Role.values());
+        if (user.getUserProfile() != null && user.getUserProfile().getDateOfBirth() != null)
+            model.addAttribute("convertedDate",
+                    MessageUtil.convertDate(user.getUserProfile().getDateOfBirth()));
 
         return "user/admin/userEdit";
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
-    @PostMapping("/users")
-    public String userSave(
-            @RequestParam String username,
-            @RequestParam String password,
-            @RequestParam Map<String, String> form,
-            @RequestParam("userId") Long userId
-    ) {
-        userService.saveUser(username, password, form, userId);
-
-        return "redirect:/users";
-    }
-
-    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/users/{id}/delete")
-    public String deleteUser(@PathVariable Long id) throws IOException {
-        userService.deleteUser(userService.findById(id));
+    public String deleteUser(@PathVariable Long id,
+                             @AuthenticationPrincipal User currentUser) throws IOException {
+        userService.deleteUser(userService.findById(id), currentUser);
 
         return "redirect:/users";
     }

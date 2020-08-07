@@ -78,16 +78,36 @@ input[type="radio"] + label span, input[type="radio"]:checked + label span {
 }
 
 #send:after {
-    content: none!important;
+    content: none !important;
 }
+
 #send {
     border: none;
     border-radius: 0;
 }
+
 .userProfile:before, .userPic:before {
     content: '';
     height: 1px;
     width: 100%;
-    background: lightgray;
+    background: var(--secondary);
     margin: 1rem 0;
 }
+
+@media (min-width: 768px) {
+    .card-columns {
+        column-count: 2;
+    }
+}
+
+@media (min-width: 992px) {
+    .card-columns {
+        column-count: 2;
+    }
+}
+
+.custom-file-label::after {
+    content: 'Выбрать';
+}
+
+

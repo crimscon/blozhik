@@ -7,6 +7,7 @@ import com.project.MVC.model.enums.Color;
 import com.project.MVC.service.MessagesService;
 import com.project.MVC.service.UserService;
 import com.project.MVC.util.ControllerUtil;
+import com.project.MVC.util.MessageUtil;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -18,13 +19,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.io.IOException;
-import java.text.DecimalFormat;
-import java.util.Map;
 
 @Controller
 @SessionAttributes(names = {"errors", "errorMessage", "invalids", "invalidComment"})
@@ -48,7 +45,7 @@ public class MessagesController {
         model.addAttribute("page", messagesService.findAll(pageable, user));
         model.addAttribute("url", "/messages");
 
-        addMessageSendPart(model);
+        ControllerUtil.addMessageSendPart(model);
 
         status.setComplete();
 
@@ -65,40 +62,15 @@ public class MessagesController {
                              @RequestParam Color color,
                              @AuthenticationPrincipal User user,
                              Model model) throws IOException {
-        boolean hasErrors = message.getText().isEmpty() && (file == null || file.isEmpty());
-        boolean fileTooBig = ((file != null || !file.isEmpty()) && ((file.getSize() / 1024) > 5000));
+        if (ControllerUtil.hasErrors(bindingResult, message, file)) {
 
-        if (bindingResult.hasErrors() || hasErrors || fileTooBig) {
-
-            Map<String, String> errors = ControllerUtil.getErrors(bindingResult);
-
-            if (hasErrors && message.getTitle().isEmpty())
-                errors.put("fillError", "Необходимо заполнить хотя бы одно поле");
-            else if (hasErrors && !message.getTitle().isEmpty())
-                errors.put("titleError", "Нельзя отправить сообщение только с заголовком");
-            else if (fileTooBig) {
-                double fileWeight = (double) file.getSize() / 1024;
-                int degree = 1;
-                while (fileWeight > 500) {
-                    fileWeight /= 1024;
-                    degree++;
-                }
-                errors.put("filenameError", "Нельзя добавлять файлы более 5Мб. " +
-                        "Ваш файл весит " + new DecimalFormat("#0.0").format(fileWeight) + ((degree == 2) ? "Мб" : "Гб"));
-            }
-
-            errors.put("url", "add");
-
+            ControllerUtil.addErrorsToModel(bindingResult, message, file, model);
 
         } else {
             messagesService.createMessage(message, file, user, color);
         }
 
-        UriComponents componentsBuilder = UriComponentsBuilder.fromHttpUrl(referer).build();
-
-        componentsBuilder.getQueryParams().forEach(redirectAttributes::addAttribute);
-
-        return "redirect:" + componentsBuilder.getPath();
+        return ControllerUtil.createRedirect(redirectAttributes, referer);
 
     }
 
@@ -130,23 +102,18 @@ public class MessagesController {
         messagesService.addViewers(message);
 
         model.addAttribute("message", message);
-        model.addAttribute("convertedDateMessage", messagesService.convertDate(message.getDate()));
+        model.addAttribute("convertedDateMessage", MessageUtil.convertDate(message.getDate()));
         model.addAttribute("author", userService.findById(message.getAuthor().getId()));
         model.addAttribute("comments", messagesService.findCommentsByMessage(messagesService.findById(id), pageable));
         model.addAttribute("url", "/messages/" + id);
         model.addAttribute("availableEdit",
                 messagesService.availableEdit(message, currentUser));
 
-        addMessageSendPart(model);
+        ControllerUtil.addMessageSendPart(model);
 
         status.setComplete();
 
         return "messageDetail";
-    }
-
-    public static void addMessageSendPart(Model model) {
-        model.addAttribute("messageSend", true);
-        model.addAttribute("colors", Color.values());
     }
 
     @GetMapping("messages/{id}/edit")
@@ -157,7 +124,7 @@ public class MessagesController {
 
         model.addAttribute("message", message);
 
-        addMessageSendPart(model);
+        ControllerUtil.addMessageSendPart(model);
 
         return messagesService.availableEdit(message, currentUser)
                 ? "messageDetail" : "redirect:/messages/" + id;
@@ -170,11 +137,7 @@ public class MessagesController {
                        @RequestHeader(required = false) String referer) {
         messagesService.like(user, id);
 
-        UriComponents componentsBuilder = UriComponentsBuilder.fromHttpUrl(referer).build();
-
-        componentsBuilder.getQueryParams().forEach(redirectAttributes::addAttribute);
-
-        return "redirect:" + componentsBuilder.getPath();
+        return ControllerUtil.createRedirect(redirectAttributes, referer);
     }
 
 }

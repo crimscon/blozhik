@@ -9,7 +9,7 @@
                 </div>
                 <input type="text" class="form-control" placeholder="Username" aria-label="Username"
                        aria-describedby="basic-addon1"
-                       name="filter" value="${filter?ifExists}">
+                       name="filter" value="${filter!}">
                 <div class="input-group-append">
                     <button class="btn btn-outline-secondary" type="submit" id="button-addon1">Search</button>
                 </div>
