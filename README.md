@@ -17,7 +17,9 @@
 * FlyWay
 * Maven
 * PostgreSQL
-* BootStrap 4
+* HTML/CSS
+   * Freemarker
+   * Bootstrap 4
 
 Все исходники, которые находятся в репозитории являются локальными 
 и не требуют подключения к облачным сервисам
