@@ -19,8 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.io.IOException;
@@ -72,11 +70,7 @@ public class MessagesController {
             messagesService.createMessage(message, file, user, color);
         }
 
-        UriComponents componentsBuilder = UriComponentsBuilder.fromHttpUrl(referer).build();
-
-        componentsBuilder.getQueryParams().forEach(redirectAttributes::addAttribute);
-
-        return "redirect:" + componentsBuilder.getPath();
+        return ControllerUtil.createRedirect(redirectAttributes, referer);
 
     }
 
@@ -143,11 +137,7 @@ public class MessagesController {
                        @RequestHeader(required = false) String referer) {
         messagesService.like(user, id);
 
-        UriComponents componentsBuilder = UriComponentsBuilder.fromHttpUrl(referer).build();
-
-        componentsBuilder.getQueryParams().forEach(redirectAttributes::addAttribute);
-
-        return "redirect:" + componentsBuilder.getPath();
+        return ControllerUtil.createRedirect(redirectAttributes, referer);
     }
 
 }

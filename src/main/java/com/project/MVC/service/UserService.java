@@ -29,10 +29,11 @@ import java.util.stream.Collectors;
 public class UserService implements UserDetailsService {
     private final UserRepository userRepo;
     private final UserProfileRepository userProfileRepo;
+    private final PasswordEncoder passwordEncoder;
+
     private final MessagesService messagesService;
     private final MessagesRepository messagesRepository;
     private final CommentRepository commentRepository;
-    private final PasswordEncoder passwordEncoder;
 
     @Value("${upload.path}")
     private String uploadPath;
@@ -40,10 +41,11 @@ public class UserService implements UserDetailsService {
     public UserService(UserRepository userRepo, UserProfileRepository userProfileRepo, MessagesService messagesService, MessagesRepository messagesRepository, CommentRepository commentRepository, @Lazy PasswordEncoder passwordEncoder) {
         this.userRepo = userRepo;
         this.userProfileRepo = userProfileRepo;
+        this.passwordEncoder = passwordEncoder;
+
         this.messagesService = messagesService;
         this.messagesRepository = messagesRepository;
         this.commentRepository = commentRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -94,36 +96,11 @@ public class UserService implements UserDetailsService {
         user.setRoles(roleSet);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        save(user);
-    }
-
-    public void saveUser(String username, String password,
-                         Map<String, String> form, Long userId) {
-        User user = findById(userId);
-        user.setUsername(username);
-        user.setPassword(passwordEncoder.encode(password));
-
-        Set<String> roles = Arrays.stream(Role.values())
-                .map(Role::name)
-                .collect(Collectors.toSet());
-
-        user.getRoles().clear();
-
-        for (String key : form.keySet()) {
-            if (roles.contains(key)) {
-                user.getRoles().add(Role.valueOf(key));
-            }
-        }
-
         userRepo.save(user);
     }
 
     public List<User> findAll() {
         return userRepo.findAll();
-    }
-
-    public void save(User user) {
-        userRepo.save(user);
     }
 
     public void deleteUser(User deletingUser, User currentUser) throws IOException {
@@ -249,14 +226,34 @@ public class UserService implements UserDetailsService {
 
     public void changePassword(User currentUser, User user,
                                String oldPassword, String newPassword, String newPasswordConfirm) {
-        if (currentUser.equals(user) || currentUser.getRoles().contains(Role.ADMIN)) {
-            if (currentUser.getRoles().contains(Role.ADMIN) ||
-                    passwordEncoder.matches(oldPassword, user.getPassword())) {
-                if (newPassword.equals(newPasswordConfirm)) {
-                    user.setPassword(passwordEncoder.encode(newPassword));
-                    userRepo.save(user);
+        if (currentUser.getRoles().contains(Role.ADMIN)) {
+            user.setPassword(passwordEncoder.encode(newPassword));
+            userRepo.save(user);
+        } else if (currentUser.equals(user)) {
+            if (passwordEncoder.matches(oldPassword, user.getPassword())
+                    && newPassword.equals(newPasswordConfirm)) {
+                user.setPassword(passwordEncoder.encode(newPassword));
+                userRepo.save(user);
+            }
+        }
+    }
+
+    public void changeRoles(User currentUser, User user, Map<String, String> form) {
+        if (currentUser.getRoles().contains(Role.ADMIN)) {
+
+            Set<String> roles = Arrays.stream(Role.values())
+                    .map(Role::name)
+                    .collect(Collectors.toSet());
+
+            user.getRoles().clear();
+
+            for (String key : form.keySet()) {
+                if (roles.contains(key)) {
+                    user.getRoles().add(Role.valueOf(key));
                 }
             }
+
+            userRepo.save(user);
         }
     }
 }

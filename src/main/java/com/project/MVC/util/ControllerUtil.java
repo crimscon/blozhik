@@ -7,6 +7,9 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.text.DecimalFormat;
 import java.util.Map;
@@ -78,5 +81,13 @@ public abstract class ControllerUtil {
     public static void addMessageSendPart(Model model) {
         model.addAttribute("messageSend", true);
         model.addAttribute("colors", Color.values());
+    }
+
+    public static String createRedirect(RedirectAttributes redirectAttributes, String referer) {
+        UriComponents componentsBuilder = UriComponentsBuilder.fromHttpUrl(referer).build();
+
+        componentsBuilder.getQueryParams().forEach(redirectAttributes::addAttribute);
+
+        return "redirect:" + componentsBuilder.getPath();
     }
 }

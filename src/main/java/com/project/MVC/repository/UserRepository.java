@@ -11,6 +11,6 @@ import java.util.List;
 public interface UserRepository extends JpaRepository<User, Long> {
     User findByUsernameIgnoreCase(String username);
 
-    @Query(value = "select * from usr order by id", nativeQuery = true)
+    @Query("select u from User u order by u.id")
     List<User> findAll();
 }

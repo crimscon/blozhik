@@ -2,6 +2,7 @@ package com.project.MVC.controller;
 
 import com.project.MVC.model.User;
 import com.project.MVC.model.dto.MessageDto;
+import com.project.MVC.model.enums.Gender;
 import com.project.MVC.model.enums.Role;
 import com.project.MVC.service.MessagesService;
 import com.project.MVC.service.UserService;
@@ -20,7 +21,6 @@ import org.springframework.web.bind.support.SessionStatus;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 @Controller
 @SessionAttributes(names = "errors")
@@ -113,7 +113,7 @@ public class UserController {
 
     @GetMapping("{username}/unsubscribe")
     public String unsubscribe(@PathVariable String username,
-                            @AuthenticationPrincipal User currentUser) {
+                              @AuthenticationPrincipal User currentUser) {
         userService.unsubscribe(userService.getUserByUsername(username), currentUser);
 
         return "redirect:/{username}/profile";
@@ -157,23 +157,14 @@ public class UserController {
     @GetMapping("/users/{userId}")
     public String userEditForm(@PathVariable Long userId, Model model) {
         User user = userService.findById(userId);
-        model.addAttribute("user", user);
+        model.addAttribute("profile", user);
+        model.addAttribute("genders", Gender.values());
         model.addAttribute("roles", Role.values());
+        if (user.getUserProfile() != null && user.getUserProfile().getDateOfBirth() != null)
+            model.addAttribute("convertedDate",
+                    MessageUtil.convertDate(user.getUserProfile().getDateOfBirth()));
 
         return "user/admin/userEdit";
-    }
-
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @PostMapping("/users")
-    public String userSave(
-            @RequestParam String username,
-            @RequestParam String password,
-            @RequestParam Map<String, String> form,
-            @RequestParam("userId") Long userId
-    ) {
-        userService.saveUser(username, password, form, userId);
-
-        return "redirect:/users";
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
