@@ -192,7 +192,7 @@ public class UserService implements UserDetailsService {
             UserProfile userProfile = user.getUserProfile() == null ?
                     new UserProfile() : userProfileRepo.getOne(user.getUserProfile().getId());
 
-            if (!userProfile.getPhoneNumber().equals(phone) || !phone.isEmpty()) {
+            if (!phone.equals(userProfile.getPhoneNumber()) || !phone.isEmpty()) {
                 userProfile.setPhoneNumber(phone);
                 user.setUserProfile(userProfile);
 

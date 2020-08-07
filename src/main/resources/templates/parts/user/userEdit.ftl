@@ -8,7 +8,7 @@
             <input type="date" class="form-control" id="dob" name="dateOfBirth"
                     <#if profile.getUserProfile()?? && convertedDate??>
                 value="${convertedDate?date?iso_m("GMT+03")}"
-                oninput="document.getElementById('saveProfile').removeAttribute('hidden')"
+                onchange="document.getElementById('saveProfile').removeAttribute('hidden')"
                     </#if>>
 
         </div>
