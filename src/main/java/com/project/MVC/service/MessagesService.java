@@ -11,27 +11,38 @@ import com.project.MVC.repository.MessagesRepository;
 import com.project.MVC.util.MessageUtil;
 import com.project.MVC.util.ThumbnailUtil;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
 public class MessagesService {
 
     private final MessagesRepository messagesRepository;
     private final CommentRepository commentRepository;
+    private final UserService userService;
 
     @Value("${upload.path}")
     private String uploadPath;
 
-    public MessagesService(MessagesRepository messagesRepository, CommentRepository commentRepository) {
+    public MessagesService(MessagesRepository messagesRepository,
+                           CommentRepository commentRepository,
+                           @Lazy UserService userService) {
         this.messagesRepository = messagesRepository;
         this.commentRepository = commentRepository;
+        this.userService = userService;
     }
 
     public void createMessage(Message message,
@@ -129,6 +140,12 @@ public class MessagesService {
         return messagesRepository.findAll(pageable, user);
     }
 
+    public Page<MessageDto> findSubsMessages(User user, Pageable pageable) {
+        Set<User> subs = new HashSet<>(user.getSubscriptions());
+        subs.add(user);
+        return messagesRepository.findSubsMessages(subs, user, pageable);
+    }
+
     public void addViewers(MessageDto messageDto) {
         Message message = messagesRepository.getOne(messageDto.getId());
 
@@ -142,8 +159,7 @@ public class MessagesService {
         Message message = findById(id);
         Set<User> likes = message.getLikes();
 
-        if (likes.contains(user)) likes.remove(user);
-        else likes.add(user);
+        if (!likes.remove(user)) likes.add(user);
 
         messagesRepository.save(message);
     }
@@ -166,5 +182,42 @@ public class MessagesService {
 
     public Integer findUserLikes(User user) {
         return messagesRepository.findAllWhereUserLike(user).size();
+    }
+
+    public Page<MessageDto> getMessages(HttpServletRequest request, HttpServletResponse response, User user, Pageable pageable) {
+        response.setHeader("Cookie", "Path=/");
+
+        AtomicBoolean typeFounded = new AtomicBoolean(false);
+        Arrays.stream(request.getCookies())
+                .filter(cookie -> cookie.getName()
+                        .equals("typeMessage"))
+                .forEach(cookie -> typeFounded.set(true));
+
+        if (!typeFounded.get()) {
+            Cookie cookie = new Cookie("typeMessage",
+                    ((User) userService.loadUserByUsername(user.getUsername())).
+                            getSubscriptions().isEmpty() ? "all" : "subs");
+            cookie.setMaxAge(Integer.MAX_VALUE);
+            response.addCookie(cookie);
+        }
+
+        Cookie[] cookies = request.getCookies();
+        for (Cookie cookie : cookies)
+            if ("typeMessage".equals(cookie.getName())) {
+                return "all".equals(cookie.getValue()) ? findAll(pageable, user) : findSubsMessages(user, pageable);
+            }
+
+        return findAll(pageable, user);
+    }
+
+    public void changeFeed(HttpServletRequest request, HttpServletResponse response) {
+        Cookie[] cookies = request.getCookies();
+        for (Cookie cookie : cookies) {
+            if ("typeMessage".equals(cookie.getName())) {
+                cookie.setValue(cookie.getValue().equals("all") ? "subs" : "all");
+                cookie.setMaxAge(Integer.MAX_VALUE);
+                response.addCookie(cookie);
+            }
+        }
     }
 }

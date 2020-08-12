@@ -1,7 +1,7 @@
 <#import "../pager.ftl" as p>
 <#if comments.content??><h5 class="mt-3 mb-2" id="commentBlock">Комментарии: </h5></#if>
 
-<form method="post" action="/messages/${message.getId()}/addComment">
+<form method="post" action="/message/${message.getId()}/addComment">
     <div class="row mb-3">
         <div class="col-8 col-lg-11 pr-0">
             <textarea name="text" class="form-control shadow-none
