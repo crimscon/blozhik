@@ -13,6 +13,20 @@
     </style>
 
     <div class="col-sm-12 col-md-12 col-lg-12">
+        <div class="text-center card my-3 p-3 sticky">
+            <form method="get" action="/changeFeed">
+                <#if messageType == 'subs'>
+                    <button class="stretched-link text-decoration-none text-secondary btn btn-block" type="submit">
+                        Перейти во все сообщения
+                    </button>
+                <#elseif  messageType == 'all'>
+                    <button class="stretched-link text-decoration-none text-secondary btn btn-block" type="submit">
+                        Перейти в мою ленту
+                    </button>
+                </#if>
+            </form>
+        </div>
+
         <@m.message page />
     </div>
 </@e.main>

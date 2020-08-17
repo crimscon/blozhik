@@ -8,7 +8,7 @@
                 <p class="card-text"><time style="font-size:1rem" class="text-muted">Опубликовано ${convertedDateMessage?date}</time></p>
             <#else>
                 <p class="card-text">${message.getAnnounce()}</p>
-                <a href="/messages/${message.id}" class="stretched-link"></a>
+                <a href="/message/${message.id}" class="stretched-link"></a>
             </#if>
         </div>
         <#include "cardFooter.ftl">
@@ -20,7 +20,7 @@
         <#if convertedDateMessage??>
             <p class="card-text"><time style="font-size:1rem" class="text-muted">Опубликовано ${convertedDateMessage?date}</time></p>
         <#else>
-            <a href="/messages/${message.id}" class="stretched-link"></a>
+            <a href="/message/${message.id}" class="stretched-link"></a>
         </#if>
         <#include "cardFooter.ftl">
     </div>
@@ -33,7 +33,7 @@
                 <p class="card-text"><time style="font-size:1rem" class="text-muted">Опубликовано ${convertedDateMessage?date}</time></p>
             <#else>
                 <p>${message.getAnnounce()}</p>
-                <a href="/messages/${message.id}" class="stretched-link"></a>
+                <a href="/message/${message.id}" class="stretched-link"></a>
             </#if>
         </blockquote>
         <#include "cardFooter.ftl">
@@ -46,7 +46,7 @@
                 <p class="card-text"><time style="font-size:1rem" class="text-muted">Опубликовано ${convertedDateMessage?date}</time></p>
             <#else>
                 <p>${message.getAnnounce()}</p>
-                <a href="/messages/${message.id}" class="stretched-link"></a>
+                <a href="/message/${message.id}" class="stretched-link"></a>
             </#if>
         </blockquote>
         <#include "cardFooter.ftl">
@@ -60,7 +60,7 @@
                 <p class="card-text"><time style="font-size:1rem" class="text-muted">Опубликовано ${convertedDateMessage?date}</time></p>
             <#else>
                 <p class="card-text">${message.getAnnounce()}</p>
-                <a href="/messages/${message.id}" class="stretched-link"></a>
+                <a href="/message/${message.id}" class="stretched-link"></a>
             </#if>
         </div>
         <#include "cardFooter.ftl">
@@ -72,7 +72,7 @@
         <#if convertedDateMessage??>
             <p class="card-text m-2"><time style="font-size:1rem" class="text-muted">Опубликовано ${convertedDateMessage?date}</time></p>
         <#else>
-            <a href="/messages/${message.id}" class="stretched-link"></a>
+            <a href="/message/${message.id}" class="stretched-link"></a>
         </#if>
 
         <#include "cardFooter.ftl">

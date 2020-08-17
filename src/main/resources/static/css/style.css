@@ -110,4 +110,10 @@ input[type="radio"] + label span, input[type="radio"]:checked + label span {
     content: 'Выбрать';
 }
 
+.sticky {
+    top: 10%;
+    z-index: 1000;
+    position: sticky;
+}
+
 

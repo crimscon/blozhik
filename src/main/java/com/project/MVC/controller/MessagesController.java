@@ -20,6 +20,8 @@ import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 
@@ -36,13 +38,24 @@ public class MessagesController {
         this.userService = userService;
     }
 
+    @GetMapping("/changeFeed")
+    public String changeFeed(HttpServletRequest request, HttpServletResponse response) {
+        messagesService.changeFeed(request, response);
+        return "redirect:/messages";
+    }
+
     @GetMapping("/messages")
-    public String getMessages(Model model,
-                              @AuthenticationPrincipal User user,
-                              SessionStatus status,
-                              @PageableDefault(sort = {"id"},
-                                      direction = Sort.Direction.DESC) Pageable pageable) {
-        model.addAttribute("page", messagesService.findAll(pageable, user));
+    public String getMessages(HttpServletRequest request, HttpServletResponse response,
+                                 @CookieValue(name = "typeMessage", required = false, defaultValue = "all") String type,
+                                 Model model,
+                                 @AuthenticationPrincipal User user,
+                                 SessionStatus status,
+                                 @PageableDefault(sort = {"id"},
+                                         direction = Sort.Direction.DESC) Pageable pageable) {
+
+        model.addAttribute("page", messagesService.getMessages(request, response,
+                (User) userService.loadUserByUsername(user.getUsername()), pageable));
+        model.addAttribute("messageType", type);
         model.addAttribute("url", "/messages");
 
         ControllerUtil.addMessageSendPart(model);
@@ -51,7 +64,6 @@ public class MessagesController {
 
         return "main";
     }
-
 
     @PostMapping("/add")
     public String addMessage(RedirectAttributes redirectAttributes,
@@ -74,7 +86,7 @@ public class MessagesController {
 
     }
 
-    @GetMapping("/messages/{id}/delete")
+    @GetMapping("/message/{id}/delete")
     public String deleteMessage(@PathVariable Long id,
                                 @AuthenticationPrincipal User user) throws IOException {
         return messagesService.deleteMessage(id, user) ? "redirect:/messages" : "redirect:/messages/" + id;
@@ -91,7 +103,7 @@ public class MessagesController {
         return "redirect:/messages/" + id;
     }
 
-    @GetMapping("/messages/{id}")
+    @GetMapping("/message/{id}")
     public String getMessage(@PathVariable Long id,
                              SessionStatus status,
                              @AuthenticationPrincipal User currentUser,
@@ -116,7 +128,7 @@ public class MessagesController {
         return "messageDetail";
     }
 
-    @GetMapping("messages/{id}/edit")
+    @GetMapping("message/{id}/edit")
     public String getEditForm(@PathVariable Long id,
                               @AuthenticationPrincipal User currentUser,
                               Model model) {
@@ -130,7 +142,7 @@ public class MessagesController {
                 ? "messageDetail" : "redirect:/messages/" + id;
     }
 
-    @GetMapping("messages/{id}/like")
+    @GetMapping("message/{id}/like")
     public String like(@AuthenticationPrincipal User user,
                        @PathVariable Long id,
                        RedirectAttributes redirectAttributes,

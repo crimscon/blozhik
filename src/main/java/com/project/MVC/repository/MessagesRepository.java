@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface MessagesRepository extends JpaRepository<Message, Long> {
@@ -61,4 +62,14 @@ public interface MessagesRepository extends JpaRepository<Message, Long> {
 
     @Query("select count(m) from Message m where m.author = :user")
     Integer findCountMessagesByUser(@Param("user") User user);
+
+    @Query("select new com.project.MVC.model.dto.MessageDto(" +
+            "   m, " +
+            "   count(ml), " +
+            "   sum(case when ml = :user then 1 else 0 end) > 0" +
+            ") " +
+            "from Message m left join m.likes ml " +
+            "where m.author in :subs " +
+            "group by m")
+    Page<MessageDto> findSubsMessages(@Param("subs") Set<User> subs, User user, Pageable pageable);
 }

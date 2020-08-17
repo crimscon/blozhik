@@ -4,7 +4,7 @@
     <div class="row justify-content-between">
         <div class="<#if availableEdit??>col<#else>col-6</#if> pl-1">
             <div class="btn-group" role="group" aria-label="Basic example">
-                <a href="/messages/${message.getId()}/like" class="btn btn-outline-${message.getColor()?lower_case}">
+                <a href="/message/${message.getId()}/like" class="btn btn-outline-${message.getColor()?lower_case}">
                     <#if message.getMeLiked()>
                         <i class="fas fa-heart"></i>
                     <#else>
@@ -18,14 +18,14 @@
                                 data-target="#editMessage">
                             <i class="far fa-edit"></i>
                         </button>
-                        <@edit.messageEditForm "/messages/${message.getId()}/edit" message "editMessage"/>
+                        <@edit.messageEditForm "/message/${message.getId()}/edit" message "editMessage"/>
 
-                        <a href="/messages/${message.getId()}/delete"
+                        <a href="/message/${message.getId()}/delete"
                            class="btn btn-outline-${message.getColor()?lower_case}"><i
                                     class="far fa-trash-alt"></i></a>
                     </#if>
                 <#else>
-                    <a href="/messages/${message.getId()}/#commentBlock"
+                    <a href="/message/${message.getId()}/#commentBlock"
                        class="btn btn-outline-${message.getColor()?lower_case}"><i
                                 class="fas fa-comment-alt"></i>
                         ${message.getComments()}</a>
