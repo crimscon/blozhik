@@ -45,10 +45,10 @@ public class MessagesService {
         this.userService = userService;
     }
 
-    public void createMessage(Message message,
-                              MultipartFile file,
-                              User user,
-                              Color color) throws IOException {
+    public boolean createMessage(Message message,
+                                 MultipartFile file,
+                                 User user,
+                                 Color color) throws IOException {
         message.setText(MessageUtil.createText(message.getText()));
         message.setAuthor(user);
         message.setColor(color);
@@ -64,7 +64,10 @@ public class MessagesService {
                 !message.getTitle().isEmpty() ||
                 !message.getText().isEmpty()) {
             messagesRepository.save(message);
+            return true;
         } else ThumbnailUtil.deleteIfExistFile(uploadPath, message.getFilename());
+
+        return false;
     }
 
     public Page<MessageDto> findWhereMeLiked(Pageable pageable, User user) {
@@ -97,12 +100,12 @@ public class MessagesService {
 
     public boolean availableEdit(MessageDto message, User currentUser) {
         return (message.getDate() != null
-                && message.getAuthor().getId().equals(currentUser.getId())
+                && message.getAuthor().equals(currentUser)
                 && message.getDate().plusDays(1).isAfter(LocalDateTime.now()))
                 || currentUser.getRoles().contains(Role.ADMIN);
     }
 
-    public void editMessage(User user, Long id, String title, String text, Color color) {
+    public boolean editMessage(User user, Long id, String title, String text, Color color) {
         Message message = messagesRepository.getOne(id);
 
         boolean changeText = false,
@@ -128,8 +131,12 @@ public class MessagesService {
             changeColor = true;
         }
 
-        if (changeColor || changeText || changeTitle)
+        if (changeColor || changeText || changeTitle) {
             messagesRepository.save(message);
+            return true;
+        }
+
+        return false;
     }
 
     public Page<MessageDto> messageListForUser(Pageable pageable, User author, User currentUser) {
@@ -155,21 +162,28 @@ public class MessagesService {
         messagesRepository.save(message);
     }
 
-    public void like(User user, Long id) {
+    public boolean like(User user, Long id) {
         Message message = findById(id);
         Set<User> likes = message.getLikes();
 
-        if (!likes.remove(user)) likes.add(user);
+        if (!likes.remove(user))
+            likes.add(user);
 
         messagesRepository.save(message);
+
+        return likes.contains(user);
     }
 
-    public void addComment(Long messageId, Comment comment, User user) {
+    public boolean addComment(Long messageId, Comment comment, User user) {
         Message message = findById(messageId);
-        comment.setText(MessageUtil.createText(comment.getText()));
-        comment.setUser(user);
-        comment.setMessage(message);
-        commentRepository.save(comment);
+        if (message != null) {
+            comment.setText(MessageUtil.createText(comment.getText()));
+            comment.setUser(user);
+            comment.setMessage(message);
+            commentRepository.save(comment);
+            return true;
+        }
+        return false;
     }
 
     public Page<Comment> findCommentsByMessage(Message message, Pageable pageable) {

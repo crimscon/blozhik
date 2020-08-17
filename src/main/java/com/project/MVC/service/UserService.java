@@ -82,7 +82,11 @@ public class UserService implements UserDetailsService {
         return users;
     }
 
-    public void addUser(User user) {
+    public boolean addUser(User user) {
+
+        if (userRepo.findByEmailIgnoreCase(user.getEmail()) != null) {
+            return false;
+        }
 
         user.setActive(true);
 
@@ -97,6 +101,8 @@ public class UserService implements UserDetailsService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         userRepo.save(user);
+        return true;
+
     }
 
     public List<User> findAll() {
