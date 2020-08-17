@@ -15,6 +15,7 @@
     * Validation
     * Web
 * FlyWay
+* JUnit
 * Maven
 * PostgreSQL
 * HTML/CSS
