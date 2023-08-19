@@ -1,8 +1,8 @@
 <div class="mt-3 d-none d-lg-block col-lg-4 pr-1">
     <div class="text-center">
         <figure class="figure figure-img img-thumbnail p-2" style="width: 100%">
-            <#if profile.getProfile_pic()??>
-                <img src="/img/${profile.getProfile_pic()}" id="imageResource"
+            <#if profile.getPicture()??>
+                <img src="/img/${profile.getPicture()}" id="imageResource"
                      class="rounded profilePic" alt="${profile.getUsername()}">
             <#else>
                 <img src="/static/img/avatar.svg" id="imageResource"

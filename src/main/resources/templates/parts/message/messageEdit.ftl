@@ -32,7 +32,7 @@
                       class="form-group">
                     <div class="modal-header alert-${colorMessage}">
                         <h5 class="modal-title" id="sendMessageLabel">
-                            <#if url == "../../add">Новый пост
+                            <#if url == "../../message">Новый пост
                             <#else>Редактировать пост
                             </#if>
                         </h5>

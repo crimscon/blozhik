@@ -21,8 +21,8 @@
                 <button class="btn btn-secondary bg-transparent border-0 dropdown-toggle" type="button"
                         id="profileDropdown" data-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="false">
-                    <#if user.getProfile_pic()??>
-                        <img src="/img/thumbs/${user.getProfile_pic()}"
+                    <#if user.getPicture()??>
+                        <img src="/img/thumbs/${user.getPicture()}"
                              class="rounded-circle ml-2"
                              alt="...">
                     <#else>

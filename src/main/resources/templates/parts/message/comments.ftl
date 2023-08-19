@@ -1,7 +1,11 @@
+<#-- @ftlvariable name="message" type="com.project.mvc.model.dto.MessageDto" -->
+<#-- @ftlvariable name="comments" type="org.springframework.data.domain.Page" -->
+<#-- @ftlvariable name="comment" type="com.project.mvc.model.Comment" -->
+
 <#import "../pager.ftl" as p>
 <#if comments.content??><h5 class="mt-3 mb-2" id="commentBlock">Комментарии: </h5></#if>
 
-<form method="post" action="/message/${message.getId()}/addComment">
+<form method="post" action="/messages/${message.getId()}/comment">
     <div class="row mb-3">
         <div class="col-8 col-lg-11 pr-0">
             <textarea name="text" class="form-control shadow-none
@@ -27,8 +31,8 @@
     <div class="card px-3 pt-3 pb-1 mb-2 border-${message.getColor()?lower_case}">
         <div class="media">
             <a href="/${comment.getUser().getUsername()}/profile" class="align-self-start">
-                <#if comment.getUser().getProfile_pic()??>
-                    <img src="/img/thumbs/${comment.getUser().getProfile_pic()}"
+                <#if comment.getUser().getPicture()??>
+                    <img src="/img/thumbs/${comment.getUser().getPicture()}"
                          class="figure-img img-fluid rounded-circle">
                 <#else>
                     <img src="/static/img/avatar.svg" id="imageResource"
@@ -36,7 +40,8 @@
                 </#if>
             </a>
             <div class="media-body ml-3">
-                <a class="text-decoration-none" href=/${comment.getUser().getUsername()}/profile"><h5 class="mt-0 text-muted">${comment.getUser().getUsername()}</h5></a>
+                <a class="text-decoration-none" href=/${comment.getUser().getUsername()}/profile"><h5
+                            class="mt-0 text-muted">${comment.getUser().getUsername()}</h5></a>
                 <p style="font-size:1.1rem"> ${comment.getText()}</p>
             </div>
         </div>

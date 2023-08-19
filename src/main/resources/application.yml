@@ -1,0 +1,31 @@
+server:
+  port: 8081
+
+upload:
+  path: D:/mvc/images
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:8080/mvc
+    username: postgres
+    password: root
+
+  jpa:
+    generate-ddl: false
+    show-sql: false
+    hibernate:
+      ddl-auto: validate
+
+  freemarker:
+    expose-request-attributes: true
+    suffix: .ftl
+
+  servlet:
+    multipart:
+      max-file-size: -1
+      max-request-size: -1
+
+  session:
+    jdbc:
+      initialize-schema: always
+      table-name: SPRING_SESSION

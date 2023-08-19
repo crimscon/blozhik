@@ -1,123 +1,124 @@
-function GetButtons() {
+class Elements {
+    constructor() {
+        this.domElements = {
+            modal: document.getElementById('Message'),
+            header: document.querySelector('.modal-header'),
+            footer: document.querySelector('.modal-footer')
+        };
 
-    return {
-
-        buttonSelf: $(`.modal-footer`).find(`#dropdownMenuButton`),
-        buttonFile: $(`.buttonFile`).find("button:first"),
-        fileLabel: $(`.modal-footer`).find(`#send`),
-        buttonSubmit: $(`.modal-footer`).find(`#submit`),
-
-        modal: $(`#Message`),
-        header: $(`.modal-header`),
-
+        this.buttons = {
+            self: this.domElements.footer.querySelector('#dropdownMenuButton'),
+            file: document.querySelector('.buttonFile button:first-child'),
+            label: this.domElements.footer.querySelector('#send'),
+            submit: this.domElements.footer.querySelector('#submit')
+        };
     }
 
-}
-
-function GetColor() {
-    const buttonSelf = $(`#dropdownMenuButton`);
-
-    const classes = buttonSelf.attr('class');
-    if (classes !== undefined) {
-        classList = classes.split(/\s+/);
-        let classAttributes = classList[classList.length - 1].split('-');
-
-        return classAttributes[classAttributes.length - 1];
-    } else return "primary";
-}
-
-function _changeColorMake(color) {
-
-    changeColor.buttons = new function () {
-        this._ = color || GetColor();
-
-        this.buttonSelf = "btn-outline-" + this._;
-        this.buttonFile = this.buttonSelf;
-        this.fileLabel = "border-" + this._;
-        this.buttonSubmit = this.buttonSelf;
-
-        this.modal = "border-" + this._;
-        this.header = "alert-" + this._;
-
+    removeClassAndAdd(element, className) {
+        element.className = '';
+        element.classList.add(className);
     }
 
+    changeColor(color) {
+        const newColor = `btn-outline-${color}`;
+        Object.values(this.buttons).forEach(button => this.removeClassAndAdd(button, newColor));
+        this.removeClassAndAdd(this.domElements.modal, `border-${color}`);
+        this.removeClassAndAdd(this.domElements.header, `alert-${color}`);
+        this.removeClassAndAdd(this.buttons.label, `border-${color}`);
+    }
 }
 
-function changeColor() {
+document.addEventListener('DOMContentLoaded', () => {
+    const elements = new Elements();
+    elements.changeColor(getColor());
 
-    const id = $(this).attr("id");
+    document.querySelectorAll('.dropdown-menu input').forEach(item =>
+        item.addEventListener('click', function () {
+            elements.changeColor(this.getAttribute('id').toLowerCase());
+        })
+    );
+    applyMaskToInput('#newTel');
+    customFileHandler('#customFile');
+    customFileButtonClick('.buttonFile');
+});
 
-    const currentColor = id.toLowerCase();
-
-    const elements = GetButtons();
-
-    for (const element in elements) {
-
-        elements[element].removeClass(changeColor.buttons[element]);
-
-    }
-
-    _changeColorMake(currentColor);
-
-    for (const element in elements) {
-
-        elements[element].addClass(changeColor.buttons[element]);
-
-    }
-
+function getColor() {
+    const classes = document.getElementById('dropdownMenuButton').getAttribute('class')
+    const classList = classes.split(/\s+/);
+    const classAttributes = classList[classList.length - 1].split('-');
+    return classes ? classAttributes[classAttributes.length - 1] : 'primary';
 }
 
-_changeColorMake();
-
-document.addEventListener("DOMContentLoaded", function () {
-
-    $(".dropdown-menu").children("input").click(changeColor);
-
-})
-
-window.addEventListener("DOMContentLoaded", function () {
-    [].forEach.call(document.querySelectorAll('#newTel'), function (input) {
-        var keyCode;
-
-        function mask(event) {
-            event.keyCode && (keyCode = event.keyCode);
-            var pos = this.selectionStart;
-            if (pos < 3) event.preventDefault();
-            var matrix = "+7 (___) ___ ____",
-                i = 0,
-                def = matrix.replace(/\D/g, ""),
-                val = this.value.replace(/\D/g, ""),
-                new_value = matrix.replace(/[_\d]/g, function (a) {
-                    return i < val.length ? val.charAt(i++) || def.charAt(i) : a
-                });
-            i = new_value.indexOf("_");
-            if (i !== -1) {
-                i < 5 && (i = 3);
-                new_value = new_value.slice(0, i)
-            }
-            var reg = matrix.substr(0, this.value.length).replace(/_+/g,
-                function (a) {
-                    return "\\d{1," + a.length + "}"
-                }).replace(/[+()]/g, "\\$&");
-            reg = new RegExp("^" + reg + "$");
-            if (!reg.test(this.value) || this.value.length < 5 || keyCode > 47 && keyCode < 58) this.value = new_value;
-            if (event.type === "blur" && this.value.length < 5) this.value = ""
-        }
-
-        input.addEventListener("input", mask, false);
-        input.addEventListener("focus", mask, false);
-        input.addEventListener("blur", mask, false);
-        input.addEventListener("keydown", mask, false)
-
+function applyMaskToInput(inputSelector) {
+    [].forEach.call(document.querySelectorAll(inputSelector), function (input) {
+        input.addEventListener("input", processInputEvent, false);
+        input.addEventListener("focus", processInputEvent, false);
+        input.addEventListener("blur", processInputEvent, false);
+        input.addEventListener("keydown", processInputEvent, false)
     });
 
-});
+    const processInputEvent = (event) => {
+        const KEY_CODE = event.keyCode,
+            POSITION = event.target.selectionStart,
+            INPUT_MATRIX = "+7 (___) ___ ____";
 
-$('#customFile').on('change', function () {
-    let fileName = $(this).val().split('\\').pop();
-    $(this).next('.custom-file-label').addClass("selected").html(fileName);
-});
+        let keyCode = KEY_CODE || null,
+            value = event.target.value.replace(/\D/g, ""),
+            def = INPUT_MATRIX.replace(/\D/g, ""),
+            i = 0;
+        if (POSITION < 3) {
+            event.preventDefault();
+        }
 
-$(`.buttonFile`).find("button:first").click(function () {
-    $('#send').click();
-});
+        let newValue = INPUT_MATRIX.replace(
+            /[_\d]/g,
+            a => i < value.length ? value.charAt(i++) || def.charAt(i) : a
+        );
+        let index = newValue.indexOf("_");
+
+        if (index !== -1) {
+            if (index < 5) {
+                index = 3;
+            }
+            newValue = newValue.slice(0, index);
+        }
+
+        let regex = createRegExp(INPUT_MATRIX, event.target.value);
+        if (!regex.test(event.target.value) || event.target.value.length < 5 || keyCode > 47 && keyCode < 58) {
+            event.target.value = newValue;
+        }
+
+        if (event.type === "blur" && event.target.value.length < 5) {
+            event.target.value = "";
+        }
+    }
+
+    const createRegExp = (matrix, inputValue) => {
+        let value = matrix.substring(0, inputValue.length)
+            .replace(/_+/g, a => "\\d{1," + a.length + "}")
+            .replace(/[+()]/g, "\\$&");
+        return new RegExp("^" + value + "$");
+    }
+}
+
+function customFileHandler(fileSelector) {
+    const file = document.querySelector(fileSelector);
+
+    file.addEventListener('change', function () {
+        let fileName = this.value.split('\\').pop();
+        let nextElement = this.nextElementSibling;
+
+        if (nextElement && nextElement.classList.contains('custom-file-label')) {
+            nextElement.classList.add("selected");
+            nextElement.innerHTML = fileName.toString();
+        }
+    });
+}
+
+function customFileButtonClick(buttonSelector) {
+    const button = document.querySelector(buttonSelector).querySelector('button:first-child');
+    button.addEventListener('click', function () {
+        const sendButton = document.getElementById('send');
+        sendButton.click();
+    });
+}

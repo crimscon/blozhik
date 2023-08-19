@@ -54,7 +54,8 @@
                     </div>
                 </#list>
             </div>
-            <button class="btn btn-sm btn-block mt-2 btn-secondary" hidden id="saveRoles" type="submit">Сохранить</button>
+            <button class="btn btn-sm btn-block mt-2 btn-secondary" hidden id="saveRoles" type="submit">Сохранить
+            </button>
         </form>
     </div>
     <div class="col-sm-12 col-md-12 col-lg-8">

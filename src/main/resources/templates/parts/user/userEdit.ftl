@@ -94,9 +94,9 @@
         <input type="hidden" value="${_csrf.token}" name="_csrf">
         <div class="form-row mt-3">
             <div class="form-group">
-                <#if profile.getProfile_pic()??>
+                <#if profile.getPicture()??>
                     <a class="deletePicture" href="/${profile.getUsername()}/edit/picture/delete"><img
-                                src="/img/thumbs/${profile.getProfile_pic()}" class="rounded-circle mr-1" alt=".."></a>
+                                src="/img/thumbs/${profile.getPicture()}" class="rounded-circle mr-1" alt=".."></a>
                 </#if>
             </div>
             <div class="form-group col">

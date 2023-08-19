@@ -2,8 +2,8 @@
     <div class="row no-gutters">
         <div class="col-lg-12 mb-2">
             <h4 class="align-middle text-center text-muted display-3">
-                <#if profile.getProfile_pic()??>
-                    <img src="/img/${profile.getProfile_pic()}" id="imageResource"
+                <#if profile.getPicture()??>
+                    <img src="/img/${profile.getPicture()}" id="imageResource"
                          class="d-md d-lg-none rounded-circle" alt="${profile.getUsername()}" width="60px"
                          height="60px">
                 <#else>

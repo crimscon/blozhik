@@ -1,10 +1,11 @@
+<#-- @ftlvariable name="message" type="com.project.mvc.model.dto.MessageDto" -->
 <#import "messageEdit.ftl" as edit>
 
 <div class="card-footer bg-transparent position-relative">
     <div class="row justify-content-between">
         <div class="<#if availableEdit??>col<#else>col-6</#if> pl-1">
             <div class="btn-group" role="group" aria-label="Basic example">
-                <a href="/message/${message.getId()}/like" class="btn btn-outline-${message.getColor()?lower_case}">
+                <a href="/messages/${message.getId()}/like" class="btn btn-outline-${message.getColor()?lower_case}">
                     <#if message.getMeLiked()>
                         <i class="fas fa-heart"></i>
                     <#else>
@@ -18,14 +19,14 @@
                                 data-target="#editMessage">
                             <i class="far fa-edit"></i>
                         </button>
-                        <@edit.messageEditForm "/message/${message.getId()}/edit" message "editMessage"/>
+                        <@edit.messageEditForm "/messages/${message.getId()}/edit" message "editMessage"/>
 
-                        <a href="/message/${message.getId()}/delete"
+                        <a href="/messages/${message.getId()}/delete"
                            class="btn btn-outline-${message.getColor()?lower_case}"><i
                                     class="far fa-trash-alt"></i></a>
                     </#if>
                 <#else>
-                    <a href="/message/${message.getId()}/#commentBlock"
+                    <a href="/messages/${message.getId()}/#commentBlock"
                        class="btn btn-outline-${message.getColor()?lower_case}"><i
                                 class="fas fa-comment-alt"></i>
                         ${message.getComments()}</a>
@@ -51,15 +52,19 @@
                         </h6>
                     </#if>
                 </div>
-                <#if message.getAuthor().getProfile_pic()??>
-                    <a href="../../${message.getAuthor().getUsername()}/profile"><img
-                                src="/img/thumbs/${message.getAuthor().getProfile_pic()}"
-                                class="align-self-center img-fluid rounded-circle" alt="..."></a>
+                <#if message.getAuthor().getPicture()??>
+                    <a href="../../${message.getAuthor().getUsername()}/profile">
+                        <img src="/img/thumbs/${message.getAuthor().getPicture()}"
+                             class="align-self-center img-fluid rounded-circle"
+                             alt="...">
+                    </a>
                 <#else>
-                    <a href="../../${message.getAuthor().getUsername()}/profile"><img src="/static/img/avatar.svg"
-                                                                                      id="imageResource"
-                                                                                      class="rounded-circle"
-                                                                                      height="40px" width="40px"></a>
+                    <a href="../../${message.getAuthor().getUsername()}/profile">
+                        <img src="/static/img/avatar.svg"
+                             id="imageResource"
+                             class="rounded-circle"
+                             height="40px" width="40px">
+                    </a>
                 </#if>
             </div>
         </div>
